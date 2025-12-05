@@ -1,0 +1,9 @@
+.gradle/
+build/
+target/
+.idea/
+*.iml
+
+*.log
+*.md
+*.txt
