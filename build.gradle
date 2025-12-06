@@ -33,6 +33,13 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	runtimeOnly 'com.h2database:h2'
+
+	// RDS (MySQL)
+	//implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	//runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// Neo4j
+	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
 }
 
 tasks.named('test') {
