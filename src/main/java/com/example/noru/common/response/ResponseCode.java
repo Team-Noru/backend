@@ -12,7 +12,11 @@ public enum ResponseCode {
     SUCCESS_SIGN_UP("SUCCESS_SIGN_UP", "회원가입에 성공하였습니다.", HttpStatus.CREATED),
     SUCCESS_LOGIN("SUCCESS_LOGIN", "로그인에 성공하였습니다.", HttpStatus.OK),
 
-    STOCK_NOT_FOUND("STOCK_NOT_FOUND", "해당하는 종목이 없습니다.", HttpStatus.NOT_FOUND),
+
+    SUCCESS_NEWS_LIST("SUCCESS_NEWS_LIST", "해당 날짜 뉴스 목록 조회에 성공하였습니다.", HttpStatus.OK),
+
+
+    NEWS_NOT_FOUND("NEWS_NOT_FOUND", "뉴스 데이터가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 
     INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 

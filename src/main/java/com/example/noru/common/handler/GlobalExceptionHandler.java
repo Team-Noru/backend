@@ -1,6 +1,7 @@
 package com.example.noru.common.handler;
 
 
+import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ApiResponse;
 import com.example.noru.common.response.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
@@ -19,5 +20,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR));
+    }
+
+    @ExceptionHandler(NewsException.class)
+    public ResponseEntity<ApiResponse<?>> handleNewsException(NewsException e) {
+
+        return ResponseEntity
+                .status(e.getHttpStatus())
+                .body(ApiResponse.error(e.getResponseCode()));
     }
 }
