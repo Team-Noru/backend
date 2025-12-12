@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity
-@Table(name = "Companies")
+@Table(name = "companies")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
