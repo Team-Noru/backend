@@ -16,6 +16,7 @@ public record NewsDetailDto(
         String thumbnailUrl,
         List<String> imageUrl,
         String publisher,
+        String companyId,
         List<CompanySentimentDto> companies
 ) {
     public static NewsDetailDto fromEntity(News news) {
@@ -44,6 +45,7 @@ public record NewsDetailDto(
                 news.getThumbnailUrl(),
                 images,
                 news.getPublisher(),
+                news.getCompanyId(),
                 companySentimentDtos
         );
     }
