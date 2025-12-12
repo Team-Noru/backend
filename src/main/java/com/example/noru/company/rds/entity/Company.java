@@ -16,8 +16,8 @@ import lombok.*;
 public class Company {
 
     @Id
-    @Column(name="stock_code")
-    String stockCode;
+    @Column(name="company_id")
+    String companyId;
 
     String name;
 
