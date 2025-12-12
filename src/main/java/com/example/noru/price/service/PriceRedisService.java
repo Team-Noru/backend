@@ -1,21 +1,24 @@
 package com.example.noru.price.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class PriceRedisService {
-    private final RedisTemplate<String, String> redis;
+
+    private final StringRedisTemplate stringRedisTemplate;
 
     private static final String PREFIX = "price:";
 
-    public void save(String code, String json) {
-        redis.opsForValue().set(PREFIX + code, json);
+
+    public void savePrice(String companyId, String price) {
+        stringRedisTemplate.opsForValue().set(PREFIX + companyId, price);
     }
 
-    public String get(String code) {
-        return redis.opsForValue().get(PREFIX + code);
+    public String get(String companyId) {
+        return stringRedisTemplate.opsForValue().get(PREFIX + companyId);
     }
 }
+

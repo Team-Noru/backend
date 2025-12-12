@@ -13,22 +13,37 @@ public class PriceScheduler {
     private final PriceFetchService fetchService;
     private final PriceRedisService priceRedisService;
 
-    @Scheduled(fixedRate = 30000)
+    private boolean isRunning = false;
+
+    @Scheduled(cron = "0 * * * * *")
     public void updateAllPrices() {
 
-        String token = tokenService.getAccessToken();
+        if (isRunning) {
+            System.out.println("⏳ PriceScheduler is already running. Skipped.");
+            return;
+        }
 
-        for (String code : StockCode.CODES) {
+        isRunning = true;
 
-            try {
-                String json = fetchService.fetchPrice(token, code);
-                priceRedisService.save(code, json);
-            } catch (Exception e) {
-                System.out.println("❌ Error fetching " + code + ": " + e.getMessage());
+        try {
+            String token = tokenService.getAccessToken();
+
+            for (String companyId : StockCode.CODES) {
+                try {
+                    String json = fetchService.fetchPrice(token, companyId);
+
+
+                    priceRedisService.savePrice(companyId, json);
+
+                } catch (Exception e) {
+                    System.out.println("❌ Error fetching " + companyId + ": " + e.getMessage());
+                }
+
+                try { Thread.sleep(300); } catch (InterruptedException ignore) {}
             }
 
-            // Rate-limit 보호용 (필요시)
-            try { Thread.sleep(150); } catch (InterruptedException ignore) {}
+        } finally {
+            isRunning = false;
         }
     }
 }
