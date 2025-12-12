@@ -21,7 +21,7 @@ public class CompanySentiment {
     private News news;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stock_code", referencedColumnName = "stockCode", nullable = false)
+    @JoinColumn(name = "stock_code", referencedColumnName = "stock_code", nullable = false)
     private Company company;
 
     @Column(nullable = false)

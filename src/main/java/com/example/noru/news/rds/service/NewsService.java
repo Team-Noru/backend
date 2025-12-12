@@ -2,8 +2,9 @@ package com.example.noru.news.rds.service;
 
 import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ResponseCode;
-import com.example.noru.news.rds.dto.NewsListDto;
-import com.example.noru.news.rds.repository.NewsFakeRepository;
+import com.example.noru.news.rds.dto.response.NewsDetailDto;
+import com.example.noru.news.rds.dto.response.NewsListDto;
+import com.example.noru.news.rds.entity.News;
 import com.example.noru.news.rds.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,4 +36,12 @@ public class NewsService {
 
         return result;
     }
+
+    public NewsDetailDto getNewsDetail(Long newsId) {
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new NewsException(ResponseCode.NEWS_NOT_FOUND));
+
+        return NewsDetailDto.fromEntity(news);
+    }
 }
+

@@ -14,6 +14,7 @@ public enum ResponseCode {
 
 
     SUCCESS_NEWS_LIST("SUCCESS_NEWS_LIST", "해당 날짜 뉴스 목록 조회에 성공하였습니다.", HttpStatus.OK),
+    SUCCESS_NEWS_DETAIL("SUCCESS_NEWS_DETAIL", "뉴스 상세 조회에 성공하였습니다.", HttpStatus.OK),
 
 
     NEWS_NOT_FOUND("NEWS_NOT_FOUND", "뉴스 데이터가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
