@@ -8,5 +8,16 @@ spring:
     username: sa
     password:
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
+
+app:
+  korea-invest:
+    base-url: https://openapi.koreainvestment.com:9443
+    appkey: ${APP_KEY}
+    appsecret: ${APP_SECRET}
