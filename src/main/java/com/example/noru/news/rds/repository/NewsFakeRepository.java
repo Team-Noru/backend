@@ -23,21 +23,21 @@ public class NewsFakeRepository implements NewsRepository {
     public void init() {
 
         Company samsung = Company.builder()
-                .stockCode("005930")
+                .companyId("005930")
                 .name("삼성전자")
                 .isDomestic(true)
                 .isListed(true)
                 .build();
 
         Company skhynix = Company.builder()
-                .stockCode("000660")
+                .companyId("000660")
                 .name("SK하이닉스")
                 .isDomestic(true)
                 .isListed(true)
                 .build();
 
         Company kakao = Company.builder()
-                .stockCode("035720")
+                .companyId("035720")
                 .name("카카오")
                 .isDomestic(true)
                 .isListed(true)
