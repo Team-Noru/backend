@@ -43,6 +43,9 @@ dependencies {
 
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	implementation 'com.google.guava:guava:33.2.1-jre'
+
 }
 
 tasks.named('test') {
