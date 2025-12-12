@@ -1,8 +1,10 @@
 package com.example.noru.news.rds.entity;
 
-import com.example.noru.company.rds.entity.Company;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "news")
@@ -32,7 +34,11 @@ public class News {
 
     private String author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stock_code")  // FK: news.stock_code
-    private Company company;
+    @Builder.Default
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NewsImage> images = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CompanySentiment> companySentiments = new ArrayList<>();
 }
