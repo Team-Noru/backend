@@ -40,6 +40,9 @@ dependencies {
 
 	// Neo4j
 	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {
