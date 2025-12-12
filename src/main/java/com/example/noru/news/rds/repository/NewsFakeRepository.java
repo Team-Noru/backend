@@ -53,6 +53,7 @@ public class NewsFakeRepository implements NewsRepository {
                 .contentUrl("https://news.example.com/1")
                 .thumbnailUrl("https://img.example.com/thumb1.jpg")
                 .publisher("한국경제")
+                .companyId("005930")
                 .build();
 
 
@@ -93,6 +94,7 @@ public class NewsFakeRepository implements NewsRepository {
                 .contentUrl("https://news.example.com/2")
                 .thumbnailUrl("https://img.example.com/thumb2.jpg")
                 .publisher("조선일보")
+                .companyId("000660")
                 .build();
 
         news2.getImages().add(
@@ -120,6 +122,7 @@ public class NewsFakeRepository implements NewsRepository {
                 .contentUrl("https://news.example.com/3")
                 .thumbnailUrl("https://img.example.com/thumb3.jpg")
                 .publisher("연합뉴스")
+                .companyId("035720")
                 .build();
 
         news3.getImages().add(
@@ -156,4 +159,15 @@ public class NewsFakeRepository implements NewsRepository {
                 .filter(n -> n.getPublishedAt().equals(publishedAt))
                 .toList();
     }
+
+    @Override
+    public List<News> findByCompanyId(String companyId) {
+        return data.stream()
+                .filter(n -> n.getCompanyId() != null && n.getCompanyId().equals(companyId))
+                .sorted((a, b) -> b.getPublishedAt().compareTo(a.getPublishedAt()))
+                .toList();
+    }
+
+
+
 }

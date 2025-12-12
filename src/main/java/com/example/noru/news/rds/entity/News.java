@@ -35,6 +35,8 @@ public class News {
 
     private String author;
 
+    private String companyId;
+
     @Builder.Default
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NewsImage> images = new ArrayList<>();

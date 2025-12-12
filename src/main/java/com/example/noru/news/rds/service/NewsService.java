@@ -37,6 +37,20 @@ public class NewsService {
         return result;
     }
 
+    public List<NewsListDto> getNewsByCompanyId(String companyId) {
+
+        List<News> news = newsRepository.findByCompanyId(companyId);
+
+        if (news.isEmpty()) {
+            throw new NewsException(ResponseCode.NEWS_NOT_FOUND);
+        }
+
+        return news.stream()
+                .map(NewsListDto::fromEntity)
+                .toList();
+    }
+
+
     public NewsDetailDto getNewsDetail(Long newsId) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new NewsException(ResponseCode.NEWS_NOT_FOUND));

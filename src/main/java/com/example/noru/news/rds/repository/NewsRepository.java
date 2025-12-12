@@ -11,4 +11,6 @@ public interface NewsRepository {
     Optional<News> findById(Long id);
 
     List<News> findByPublishedAt(String date);
+
+    List<News> findByCompanyId(String companyId);
 }

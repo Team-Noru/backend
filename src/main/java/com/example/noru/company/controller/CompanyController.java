@@ -1,10 +1,12 @@
-package com.example.noru.company.rds.controller;
+package com.example.noru.company.controller;
 
 import com.example.noru.common.response.ApiResponse;
 import com.example.noru.common.response.ResponseCode;
 import com.example.noru.company.rds.dto.AnnouncementDto;
-import com.example.noru.company.rds.entity.Announcement;
 import com.example.noru.company.rds.service.AnnouncementService;
+import com.example.noru.news.rds.dto.response.NewsListDto;
+import com.example.noru.news.rds.entity.News;
+import com.example.noru.news.rds.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,14 +19,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
-public class AnnouncementController {
+public class CompanyController {
 
     private final AnnouncementService announcementService;
+    private final NewsService newsService;
 
     @GetMapping("/{companyId}/announcement")
     public ResponseEntity<?> getAnnouncements(@PathVariable String companyId) {
         List<AnnouncementDto> result = announcementService.getAnnouncementsByCompany(companyId);
 
         return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_ANNOUNCEMENT, result));
+    }
+
+    @GetMapping("/{companyId}/news")
+    public ResponseEntity<ApiResponse<List<NewsListDto>>> getNewsByCompanyId (@PathVariable String companyId) {
+        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_NEWS_COMPANY, newsService.getNewsByCompanyId(companyId)));
     }
 }
