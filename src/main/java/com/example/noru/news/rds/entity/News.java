@@ -35,7 +35,7 @@ public class News {
 
     private String author;
 
-    private String companyId;
+    private String stockCode;
 
     @Builder.Default
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)

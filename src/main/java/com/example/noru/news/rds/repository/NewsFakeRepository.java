@@ -23,21 +23,21 @@ public class NewsFakeRepository implements NewsRepository {
     public void init() {
 
         Company samsung = Company.builder()
-                .companyId("005930")
+                .stockCode("005930")
                 .name("삼성전자")
                 .isDomestic(true)
                 .isListed(true)
                 .build();
 
         Company skhynix = Company.builder()
-                .companyId("000660")
+                .stockCode("000660")
                 .name("SK하이닉스")
                 .isDomestic(true)
                 .isListed(true)
                 .build();
 
         Company kakao = Company.builder()
-                .companyId("035720")
+                .stockCode("035720")
                 .name("카카오")
                 .isDomestic(true)
                 .isListed(true)
@@ -53,7 +53,7 @@ public class NewsFakeRepository implements NewsRepository {
                 .contentUrl("https://news.example.com/1")
                 .thumbnailUrl("https://img.example.com/thumb1.jpg")
                 .publisher("한국경제")
-                .companyId("005930")
+                .stockCode("005930")
                 .build();
 
 
@@ -94,7 +94,7 @@ public class NewsFakeRepository implements NewsRepository {
                 .contentUrl("https://news.example.com/2")
                 .thumbnailUrl("https://img.example.com/thumb2.jpg")
                 .publisher("조선일보")
-                .companyId("000660")
+                .stockCode("000660")
                 .build();
 
         news2.getImages().add(
@@ -122,7 +122,7 @@ public class NewsFakeRepository implements NewsRepository {
                 .contentUrl("https://news.example.com/3")
                 .thumbnailUrl("https://img.example.com/thumb3.jpg")
                 .publisher("연합뉴스")
-                .companyId("035720")
+                .stockCode("035720")
                 .build();
 
         news3.getImages().add(
@@ -163,7 +163,7 @@ public class NewsFakeRepository implements NewsRepository {
     @Override
     public List<News> findByCompanyId(String companyId) {
         return data.stream()
-                .filter(n -> n.getCompanyId() != null && n.getCompanyId().equals(companyId))
+                .filter(n -> n.getStockCode() != null && n.getStockCode().equals(companyId))
                 .sorted((a, b) -> b.getPublishedAt().compareTo(a.getPublishedAt()))
                 .toList();
     }
