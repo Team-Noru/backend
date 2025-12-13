@@ -19,19 +19,12 @@ public record NewsDetailDto(
         String companyId,
         List<CompanySentimentDto> companies
 ) {
-    public static NewsDetailDto fromEntity(News news) {
+    public static NewsDetailDto fromEntity(
+            News news,
+            List<CompanySentimentDto> companies
+    ) {
         List<String> images = news.getImages().stream()
                 .map(NewsImage::getImageUrl)
-                .toList();
-
-        List<CompanySentimentDto> companySentimentDtos = news.getCompanySentiments().stream()
-                .map(cs -> new CompanySentimentDto(
-                        cs.getCompany().getStockCode(),
-                        cs.getCompany().getName(),
-                        cs.getCompany().isDomestic(),
-                        cs.getCompany().isListed(),
-                        cs.getSentiment()
-                ))
                 .toList();
 
         return new NewsDetailDto(
@@ -46,7 +39,7 @@ public record NewsDetailDto(
                 images,
                 news.getPublisher(),
                 news.getStockCode(),
-                companySentimentDtos
+                companies
         );
     }
 }
