@@ -5,5 +5,6 @@ public record CompanySentimentDto(
         String name,
         boolean isDomestic,
         boolean isListed,
-        String sentiment
+        String sentiment,
+        long price
 ) {}
