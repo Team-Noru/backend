@@ -17,6 +17,7 @@ public enum ResponseCode {
     SUCCESS_NEWS_COMPANY("SUCCESS_NEWS_COMPANY", "특정 기업 뉴스 목록 조회에 성공하였습니다.", HttpStatus.OK),
     SUCCESS_NEWS_DETAIL("SUCCESS_NEWS_DETAIL", "뉴스 상세 조회에 성공하였습니다.", HttpStatus.OK),
     SUCCESS_ANNOUNCEMENT("SUCCESS_ANNOUNCEMENT", "해당 기업 공시 이슈 조회에 성공하였습니다.", HttpStatus.OK),
+    SUCCESS_SEARCH("SUCCESS_SEARCH", "검색을 성공하였습니다.", HttpStatus.OK),
 
 
     NEWS_NOT_FOUND("NEWS_NOT_FOUND", "뉴스 데이터가 존재하지 않습니다.", HttpStatus.NOT_FOUND),

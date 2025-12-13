@@ -1,8 +1,8 @@
 package com.example.noru.news.rds.dto.response;
 
+import com.example.noru.news.es.NewsDocument;
 import com.example.noru.news.rds.entity.News;
 
-import java.time.LocalDateTime;
 
 public record NewsListDto (
     Long id,
@@ -24,6 +24,20 @@ public record NewsListDto (
                         .toString(),
                 news.getPublisher(),
                 news.getThumbnailUrl()
+        );
+    }
+
+    public static NewsListDto fromDocument(NewsDocument doc) {
+        return new NewsListDto(
+                doc.getId(),
+                doc.getCompanyId(),   // ES에 없으면 null
+                doc.getTitle(),
+                doc.getDescription(),
+                doc.getPublishedAt()
+                        .toLocalDate()
+                        .toString(),
+                doc.getPublisher(),
+                doc.getThumbnailUrl()
         );
     }
 }
