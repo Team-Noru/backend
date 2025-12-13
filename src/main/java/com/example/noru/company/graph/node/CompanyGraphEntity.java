@@ -15,27 +15,25 @@ import java.util.List;
 public class CompanyGraphEntity {
 
     @Id
-    private String id;                 // "corp:01480708"
+    private String ticker;
 
     @Property("corp_code")
     private String corpCode;
 
-    private String ticker;
-
     private String name;
-
-    private String market;
-
-    @Property("market_cap_eok")
-    private Double marketCapEok;
-
-    @Property("cap_bucket")
-    private String capBucket;
 
     @Property("entity_type")
     private String entityType;
 
-    @Relationship(type = "RELATION", direction = Relationship.Direction.INCOMING)
-    private List<CompanyGraphRelation> relations;
+    private String country;
 
+    @Property("is_listed")
+    private boolean isListed;
+
+
+    @Relationship(type = "RELATION", direction = Relationship.Direction.OUTGOING)
+    private List<CompanyGraphRelation> outgoing;
+
+    @Relationship(type = "RELATION", direction = Relationship.Direction.INCOMING)
+    private List<CompanyGraphRelation> incoming;
 }

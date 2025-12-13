@@ -15,28 +15,17 @@ public class CompanyGraphRelation {
     @GeneratedValue
     private Long internalId;
 
-    @Property("event_date")
-    private String eventDate;
-
-    @Property("event_tag")
-    private String eventTag;
-
-    @Property("event_type")
-    private String eventType;
-
-    @Property("rcept_no")
-    private String rceptNo;
-
     @Property("rel_type")
     private String relType;
-
-    @Property("source_json")
-    private String sourceJson;
 
     @Property("extra_json")
     private String extraJson;
 
-    private String weight;
+    @Property("news_id")
+    private String newsId;
+
+    @Property("rel_reason")
+    private String relReason;
 
     @TargetNode
     private CompanyGraphEntity investor;
