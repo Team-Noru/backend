@@ -2,6 +2,8 @@ package com.example.noru.news.rds.dto.response;
 
 import com.example.noru.news.rds.entity.News;
 
+import java.time.LocalDateTime;
+
 public record NewsListDto (
     Long id,
     String companyId,
@@ -14,10 +16,12 @@ public record NewsListDto (
     public static NewsListDto fromEntity(News news) {
         return new NewsListDto(
                 news.getId(),
-                news.getStockCode(),
+                news.getCompanyId(),
                 news.getTitle(),
                 news.getDescription(),
-                news.getPublishedAt(),
+                news.getPublishedAt()
+                        .toLocalDate()
+                        .toString(),
                 news.getPublisher(),
                 news.getThumbnailUrl()
         );

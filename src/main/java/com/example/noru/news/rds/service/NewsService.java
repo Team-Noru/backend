@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -80,7 +82,13 @@ public class NewsService {
                     .map(NewsListDto::fromEntity)
                     .toList();
         } else {
-            result = newsRepository.findByPublishedAt(date).stream()
+            LocalDate localDate = LocalDate.parse(date);
+
+            LocalDateTime start = localDate.atStartOfDay();
+            LocalDateTime end = localDate.atTime(23, 59, 59);
+
+            result = newsRepository.findByPublishedAtBetween(start, end)
+                    .stream()
                     .map(NewsListDto::fromEntity)
                     .toList();
         }
@@ -94,7 +102,7 @@ public class NewsService {
 
     public List<NewsListDto> getNewsByCompanyId(String companyId) {
 
-        List<News> news = newsRepository.findByCompanyId(companyId);
+        List<News> news = newsRepository.findByCompanyIdOrderByPublishedAtDesc(companyId);
 
         if (news.isEmpty()) {
             throw new NewsException(ResponseCode.NEWS_NOT_FOUND);
