@@ -21,7 +21,9 @@ public class NewsEsDto {
                 .title(news.getTitle())
                 .description(news.getDescription())
                 .content(news.getContent())
-                .publishedAt(news.getPublishedAt())
+                .publishedAt(news.getPublishedAt()
+                        .toLocalDate()
+                        .toString())
                 .publisher(news.getPublisher())
                 .build();
     }
