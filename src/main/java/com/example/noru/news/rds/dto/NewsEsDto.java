@@ -1,4 +1,4 @@
-package com.example.noru.news.dto;
+package com.example.noru.news.rds.dto;
 
 import com.example.noru.news.rds.entity.News;
 import lombok.Builder;

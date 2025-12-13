@@ -2,7 +2,7 @@ package com.example.noru.news.rds.service;
 
 import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ResponseCode;
-import com.example.noru.news.dto.NewsEsDto; // 아까 만든 DTO import 확인!
+import com.example.noru.news.rds.dto.NewsEsDto; // 아까 만든 DTO import 확인!
 import com.example.noru.news.rds.dto.response.CompanySentimentDto;
 import com.example.noru.news.rds.dto.response.NewsDetailDto;
 import com.example.noru.news.rds.dto.response.NewsListDto;
