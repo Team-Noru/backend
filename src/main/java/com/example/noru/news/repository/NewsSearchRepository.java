@@ -1,4 +1,4 @@
-package com.example.noru.news.rds.repository;
+package com.example.noru.news.repository;
 
 import com.example.noru.news.document.NewsDocument;
 import org.springframework.data.elasticsearch.annotations.Query;
