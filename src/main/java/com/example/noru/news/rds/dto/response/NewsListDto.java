@@ -14,7 +14,7 @@ public record NewsListDto (
     public static NewsListDto fromEntity(News news) {
         return new NewsListDto(
                 news.getId(),
-                news.getCompanyId(),
+                news.getStockCode(),
                 news.getTitle(),
                 news.getDescription(),
                 news.getPublishedAt(),

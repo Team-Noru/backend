@@ -26,7 +26,7 @@ public record NewsDetailDto(
 
         List<CompanySentimentDto> companySentimentDtos = news.getCompanySentiments().stream()
                 .map(cs -> new CompanySentimentDto(
-                        cs.getCompany().getCompanyId(),
+                        cs.getCompany().getStockCode(),
                         cs.getCompany().getName(),
                         cs.getCompany().isDomestic(),
                         cs.getCompany().isListed(),
@@ -45,7 +45,7 @@ public record NewsDetailDto(
                 news.getThumbnailUrl(),
                 images,
                 news.getPublisher(),
-                news.getCompanyId(),
+                news.getStockCode(),
                 companySentimentDtos
         );
     }
