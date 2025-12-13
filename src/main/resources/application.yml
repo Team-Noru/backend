@@ -23,6 +23,9 @@ spring:
           time_zone: Asia/Seoul
         format_sql: true
 
+  elasticsearch:
+    uris: http://10.0.3.45:9200
+
 app:
   korea-invest:
     base-url: https://openapi.koreainvestment.com:9443

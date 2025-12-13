@@ -13,4 +13,6 @@ public interface NewsRepository {
     List<News> findByPublishedAt(String date);
 
     List<News> findByCompanyId(String companyId);
+
+    News save(News news);
 }

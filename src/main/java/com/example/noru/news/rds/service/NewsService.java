@@ -2,24 +2,75 @@ package com.example.noru.news.rds.service;
 
 import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ResponseCode;
+import com.example.noru.news.dto.NewsEsDto; // 아까 만든 DTO import 확인!
 import com.example.noru.news.rds.dto.response.CompanySentimentDto;
 import com.example.noru.news.rds.dto.response.NewsDetailDto;
 import com.example.noru.news.rds.dto.response.NewsListDto;
 import com.example.noru.news.rds.entity.News;
+import com.example.noru.news.rds.entity.OutboxEvent; // Outbox 엔티티 import
 import com.example.noru.news.rds.repository.NewsRepository;
+import com.example.noru.news.rds.repository.OutboxEventRepository; // Outbox 리포지토리 import
 import com.example.noru.price.config.PriceParsingConfig;
 import com.example.noru.price.service.PriceRedisService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NewsService {
 
     private final NewsRepository newsRepository;
     private final PriceRedisService priceRedisService;
+
+    // [추가됨] Outbox 패턴을 위한 의존성 주입
+    private final OutboxEventRepository outboxEventRepository;
+    private final ObjectMapper objectMapper;
+
+    // =================================================================
+    // [추가된 메서드] 뉴스 저장 + Elasticsearch 동기화 이벤트 발행
+    // =================================================================
+    @Transactional
+    public Long saveNews(News news) {
+        // 1. MySQL에 뉴스 원본 저장
+        News savedNews = newsRepository.save(news);
+
+        // 2. Elasticsearch용 DTO로 변환
+        NewsEsDto esDto = NewsEsDto.from(savedNews);
+
+        // 3. DTO를 JSON 문자열로 변환
+        String payload = "";
+        try {
+            payload = objectMapper.writeValueAsString(esDto);
+        } catch (JsonProcessingException e) {
+            log.error("JSON 변환 에러", e);
+            throw new RuntimeException("JSON 변환 오류", e);
+        }
+
+        // 4. Outbox 테이블에 이벤트 저장 (타입: NEWS)
+        OutboxEvent event = OutboxEvent.builder()
+                .aggregateType("NEWS")       // 👈 핵심: 뉴스 데이터임
+                .aggregateId(savedNews.getId())
+                .eventType("CREATED")
+                .payload(payload)            // JSON 데이터
+                .status("PENDING")
+                .build();
+
+        outboxEventRepository.save(event);
+
+        log.info("뉴스 저장 및 검색 엔진 동기화 요청 완료: ID {}", savedNews.getId());
+        return savedNews.getId();
+    }
+
+    // =================================================================
+    // [기존 코드 유지] 아래는 작성자님이 원래 만드신 조회 로직들입니다.
+    // =================================================================
 
     public List<NewsListDto> getAllNews(String date) {
         List<NewsListDto> result;
@@ -54,7 +105,6 @@ public class NewsService {
                 .toList();
     }
 
-
     public NewsDetailDto getNewsDetail(Long newsId) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new NewsException(ResponseCode.NEWS_NOT_FOUND));
@@ -62,9 +112,17 @@ public class NewsService {
         List<CompanySentimentDto> companies =
                 news.getCompanySentiments().stream()
                         .map(cs -> {
+                            // 회사 정보가 없을 경우에 대한 방어 로직이 필요하다면 여기에 추가
+                            if (cs.getCompany() == null) return null;
+
                             String companyId = cs.getCompany().getStockCode();
                             String json = priceRedisService.get(companyId);
-                            long price = PriceParsingConfig.parsePrice(companyId, json).price();
+
+                            long price = 0;
+                            // Redis에 가격 정보가 없을 수 있으므로 예외 처리 (선택 사항)
+                            if (json != null) {
+                                price = PriceParsingConfig.parsePrice(companyId, json).price();
+                            }
 
                             return new CompanySentimentDto(
                                     companyId,
@@ -75,9 +133,9 @@ public class NewsService {
                                     price
                             );
                         })
+                        .filter(dto -> dto != null) // null 제거
                         .toList();
 
         return NewsDetailDto.fromEntity(news, companies);
     }
 }
-
