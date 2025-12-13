@@ -1,6 +1,7 @@
 package com.example.noru.common.handler;
 
 
+import com.example.noru.common.exception.CompanyException;
 import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ApiResponse;
 import com.example.noru.common.response.ResponseCode;
@@ -24,6 +25,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NewsException.class)
     public ResponseEntity<ApiResponse<?>> handleNewsException(NewsException e) {
+
+        return ResponseEntity
+                .status(e.getHttpStatus())
+                .body(ApiResponse.error(e.getResponseCode()));
+    }
+
+    @ExceptionHandler(CompanyException.class)
+    public ResponseEntity<ApiResponse<?>> handleNewsException(CompanyException e) {
 
         return ResponseEntity
                 .status(e.getHttpStatus())

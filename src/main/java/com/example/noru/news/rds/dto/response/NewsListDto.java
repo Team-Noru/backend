@@ -4,6 +4,7 @@ import com.example.noru.news.rds.entity.News;
 
 public record NewsListDto (
     Long id,
+    String companyId,
     String title,
     String description,
     String publishedAt,
@@ -13,6 +14,7 @@ public record NewsListDto (
     public static NewsListDto fromEntity(News news) {
         return new NewsListDto(
                 news.getId(),
+                news.getCompanyId(),
                 news.getTitle(),
                 news.getDescription(),
                 news.getPublishedAt(),

@@ -24,6 +24,7 @@ public class NewsController {
         return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_NEWS_LIST, newsService.getAllNews(date)));
     }
 
+
     @GetMapping("{newsId}")
     public ResponseEntity<ApiResponse<NewsDetailDto>> getNewsDetail (@PathVariable Long newsId) {
         return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_NEWS_DETAIL, newsService.getNewsDetail(newsId)));

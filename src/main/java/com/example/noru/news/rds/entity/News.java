@@ -16,6 +16,7 @@ public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="news_id")
     private Long id;
 
     private String title;
@@ -33,6 +34,8 @@ public class News {
     private String publisher;
 
     private String author;
+
+    private String companyId;
 
     @Builder.Default
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
