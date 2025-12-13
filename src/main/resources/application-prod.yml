@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: prod  # 이 설정은 'prod' 모드일 때만 작동함
+
+  datasource:
+    # [중요] AWS 내부 DB 서버 IP (10.0.3.151)
+    url: jdbc:mysql://10.0.3.151:3306/stock_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      # [중요] AWS 내부 DB 서버 IP
+      host: 10.0.3.151
+      port: 6379
+
+  elasticsearch:
+    # [중요] AWS 내부 Search 서버 IP
+    uris: http://10.0.3.45:9200
+    connection-timeout: 5s
+    socket-timeout: 30s
