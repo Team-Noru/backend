@@ -16,9 +16,9 @@ public class PriceController {
 
     private final PriceRedisService priceRedisService;
 
-    @GetMapping("/{companyId}/price")
-    public PriceDto getPrice(@PathVariable String code) {
-        String json = priceRedisService.get(code);
-        return PriceParsingConfig.parsePrice(code, json);
+    @GetMapping("{companyId}/price")
+    public PriceDto getPrice(@PathVariable String companyId) {
+        String json = priceRedisService.get(companyId);
+        return PriceParsingConfig.parsePrice(companyId, json);
     }
 }

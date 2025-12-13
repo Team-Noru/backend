@@ -24,13 +24,13 @@ public class PriceScheduler {
     private final RateLimiter rateLimiter = RateLimiter.create(3.3);
 
     // 09:00 ~ 14:59
-    @Scheduled(cron = "0 * 9-14 * * *")
+    @Scheduled(cron = "0 * 9-14 * * MON-FRI")
     public void updateMorning() {
         runScheduler();
     }
 
     // 15:00 ~ 15:29
-    @Scheduled(cron = "0 0-29 15 * * *")
+    @Scheduled(cron = "0 0-29 15 * * MON-FRI")
     public void updateAfternoon() {
         runScheduler();
     }
