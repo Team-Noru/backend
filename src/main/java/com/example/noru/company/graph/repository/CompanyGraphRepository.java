@@ -10,14 +10,10 @@ public interface CompanyGraphRepository
         extends Neo4jRepository<CompanyGraphEntity, String> {
 
     @Query("""
-    MATCH (e:Entity {ticker: $ticker})
-    OPTIONAL MATCH (e)-[r:RELATION]->(t:Entity)
-    OPTIONAL MATCH (e)<-[r2:RELATION]-(t2:Entity)
-    RETURN e,
-           collect(r), collect(t),
-           collect(r2), collect(t2)
+    MATCH (e:Entity {ticker: $id})
+    OPTIONAL MATCH (e)<-[r:RELATION]-(t:Entity)
+    RETURN e, collect(r) AS relations, collect(t) AS targets
     """)
-    Optional<CompanyGraphEntity> findByTicker(String ticker);
-
+    Optional<CompanyGraphEntity> findByTicker(String id);
 
 }

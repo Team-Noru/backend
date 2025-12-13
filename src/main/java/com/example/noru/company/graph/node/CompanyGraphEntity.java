@@ -15,10 +15,12 @@ import java.util.List;
 public class CompanyGraphEntity {
 
     @Id
-    private String ticker;
+    private String id;                 // "corp:01480708"
 
     @Property("corp_code")
     private String corpCode;
+
+    private String ticker;
 
     private String name;
 
@@ -31,9 +33,7 @@ public class CompanyGraphEntity {
     private boolean isListed;
 
 
-    @Relationship(type = "RELATION", direction = Relationship.Direction.OUTGOING)
-    private List<CompanyGraphRelation> outgoing;
-
     @Relationship(type = "RELATION", direction = Relationship.Direction.INCOMING)
-    private List<CompanyGraphRelation> incoming;
+    private List<CompanyGraphRelation> relations;
+
 }
