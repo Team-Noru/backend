@@ -32,13 +32,15 @@ public record NewsDetailDto(
                 news.getTitle(),
                 news.getDescription(),
                 news.getContent(),
-                news.getPublishedAt(),
+                news.getPublishedAt()
+                        .toLocalDate()
+                        .toString(),
                 news.getAuthor(),
                 news.getContentUrl(),
                 news.getThumbnailUrl(),
                 images,
                 news.getPublisher(),
-                news.getStockCode(),
+                news.getCompanyId(),
                 companies
         );
     }

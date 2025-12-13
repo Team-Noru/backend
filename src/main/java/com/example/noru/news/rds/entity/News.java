@@ -3,6 +3,7 @@ package com.example.noru.news.rds.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class News {
 
     private String content;
 
-    private String publishedAt;
+    private LocalDateTime publishedAt;
 
     private String thumbnailUrl;
 
@@ -35,7 +36,7 @@ public class News {
 
     private String author;
 
-    private String stockCode;
+    private String companyId;
 
     @Builder.Default
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)

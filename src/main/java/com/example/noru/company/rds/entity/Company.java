@@ -2,6 +2,7 @@ package com.example.noru.company.rds.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.checkerframework.checker.units.qual.C;
 
 @Entity
 @Table(name = "Companies")
@@ -14,6 +15,7 @@ public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="company_id")
     private Long id;
 
     @Column(unique = true)
