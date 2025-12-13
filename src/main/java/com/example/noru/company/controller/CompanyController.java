@@ -43,8 +43,8 @@ public class CompanyController {
     }
 
     @GetMapping("/{ticker}")
-    public CompanyGraphResponseDto getGraph(@PathVariable String ticker) {
+    public ResponseEntity<ApiResponse<CompanyGraphResponseDto>> getGraph(@PathVariable String ticker) {
         log.info("Request ticker = {}", ticker);
-        return graphService.getCompanyGraph(ticker);
+        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_COMPANY_DETAIL, graphService.getCompanyGraph(ticker)));
     }
 }
