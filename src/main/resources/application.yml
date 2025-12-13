@@ -16,7 +16,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         jdbc:
@@ -24,7 +24,7 @@ spring:
         format_sql: true
 
   elasticsearch:
-    uris: http://10.0.3.45:9200
+    uris: http://localhost:9200
 
 app:
   korea-invest:
