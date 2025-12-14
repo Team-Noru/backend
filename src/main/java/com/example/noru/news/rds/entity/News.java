@@ -1,8 +1,11 @@
 package com.example.noru.news.rds.entity;
 
-import com.example.noru.company.rds.entity.Company;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "news")
@@ -14,6 +17,7 @@ public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="news_id")
     private Long id;
 
     private String title;
@@ -22,7 +26,7 @@ public class News {
 
     private String content;
 
-    private String publishedAt;
+    private LocalDateTime publishedAt;
 
     private String thumbnailUrl;
 
@@ -32,7 +36,13 @@ public class News {
 
     private String author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stock_code")  // FK: news.stock_code
-    private Company company;
+    private String companyId;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NewsImage> images = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CompanySentiment> companySentiments = new ArrayList<>();
 }
