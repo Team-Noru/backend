@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CompanyRepository extends JpaRepository<Company, String> {
     @Query("""
@@ -14,4 +15,6 @@ public interface CompanyRepository extends JpaRepository<Company, String> {
           AND c.isListed = true
     """)
     List<String> findValidCompanyIds();
+
+    List<Company> findAllByStockCode(String stockCode);
 }
