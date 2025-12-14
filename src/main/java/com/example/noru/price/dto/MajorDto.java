@@ -1,7 +1,7 @@
 package com.example.noru.price.dto;
 
 public record MajorDto (
-        String code,
+        String companyId,
         String name,
         long price,          // stck_prpr
         long diffPrice,      // prdy_vrss
