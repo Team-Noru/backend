@@ -19,24 +19,25 @@ public class PriceScheduler {
     private final PriceRedisService priceRedisService;
     private final CompanyService companyService;
 
+    private final RateLimiter rateLimiter = RateLimiter.create(3.3);
     private boolean isRunning = false;
 
-    // 초당 3.3개 호출 → 약 0.3초 간격
-    private final RateLimiter rateLimiter = RateLimiter.create(3.3);
-
-    // 09:00 ~ 14:59
     @Scheduled(cron = "0 * 9-14 * * MON-FRI")
-    public void updateMorning() {
-        runScheduler();
+    public void updateDomesticMorning() {
+        runDomestic();
     }
 
-    // 15:00 ~ 15:29
     @Scheduled(cron = "0 0-29 15 * * MON-FRI")
-    public void updateAfternoon() {
-        runScheduler();
+    public void updateDomesticAfternoon() {
+        runDomestic();
     }
 
-    public void runScheduler() {
+    @Scheduled(cron = "0 0 9 * * *")
+    public void updateOverseasDaily() {
+        runOverseas();
+    }
+
+    private void runDomestic() {
 
         if (isRunning) return;
         isRunning = true;
@@ -44,13 +45,10 @@ public class PriceScheduler {
         try {
             String token = tokenService.getAccessToken();
 
-            /* =========================
-             * 1️⃣ 국내 상장 기업
-             * ========================= */
-            List<String> domesticStockCodes =
-                    companyService.getDomesticListedCompanies(); // exchange = null
+            List<String> stockCodes =
+                    companyService.getDomesticListedCompanies();
 
-            for (String stockCode : domesticStockCodes) {
+            for (String stockCode : stockCodes) {
                 rateLimiter.acquire();
 
                 try {
@@ -62,10 +60,17 @@ public class PriceScheduler {
                 }
             }
 
-            /* =========================
-             * 2️⃣ 해외 상장 기업
-             * ========================= */
-            companyService.getOverseasListedCompanies() // exchange != null
+        } finally {
+            isRunning = false;
+        }
+    }
+
+    private void runOverseas() {
+
+        try {
+            String token = tokenService.getAccessToken();
+
+            companyService.getOverseasListedCompanies()
                     .forEach(company -> {
 
                         rateLimiter.acquire();
@@ -73,7 +78,7 @@ public class PriceScheduler {
                         try {
                             String json = overseasFetchService.fetch(
                                     token,
-                                    company.getExchange(),      // BAY, BAQ, HKS …
+                                    company.getExchange(),
                                     company.getStockCode()
                             );
 
@@ -87,13 +92,12 @@ public class PriceScheduler {
                             System.out.println(
                                     "❌ Overseas fetch error "
                                             + company.getExchange() + ":" + company.getStockCode()
-                                            + " → " + e.getMessage()
                             );
                         }
                     });
 
-        } finally {
-            isRunning = false;
+        } catch (Exception e) {
+            System.out.println("❌ Overseas scheduler error: " + e.getMessage());
         }
     }
 }
