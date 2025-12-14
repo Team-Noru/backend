@@ -85,12 +85,12 @@ public class NewsService {
         List<News> newsList;
 
         if (date == null || date.isBlank()) {
-            newsList = newsRepository.findAll();
+            newsList = newsRepository.findAllByOrderByPublishedAtDesc();
         } else {
             LocalDate localDate = LocalDate.parse(date);
             LocalDateTime start = localDate.atStartOfDay();
             LocalDateTime end = localDate.atTime(23, 59, 59);
-            newsList = newsRepository.findByPublishedAtBetween(start, end);
+            newsList = newsRepository.findByPublishedAtBetweenOrderByPublishedAtDesc(start, end);
         }
 
         if (newsList.isEmpty()) {
@@ -105,7 +105,6 @@ public class NewsService {
 
         List<Company> companies = companyRepository.findAllById(companyIds);
 
-        log.info(companyIds.toString());
 
         var companyMap = companies.stream()
                 .collect(
@@ -114,20 +113,12 @@ public class NewsService {
                                 Company::getStockCode
                         )
                 );
-        companyMap.forEach((companyId, stockCode) ->
-                log.info("🧩 companyId = {}, stockCode = {}", companyId, stockCode)
-        );
+
 
         return newsList.stream()
                 .map(news -> {
                     String stockCode = companyMap.get(news.getCompanyId());
 
-                    log.info(
-                            "📰 newsId={}, news.companyId={}, mappedStockCode={}",
-                            news.getId(),
-                            news.getCompanyId(),
-                            stockCode
-                    );
 
                     return NewsListDto.fromEntity(news, stockCode);
                 })
