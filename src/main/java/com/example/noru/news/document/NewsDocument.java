@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +19,12 @@ public class NewsDocument {
     @Id
     private Long id;
 
-    @Field(type = FieldType.Text, analyzer = "nori")
+    @MultiField(
+            mainField = @Field(type = FieldType.Text, analyzer = "nori"),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
+            }
+    )
     private String title;
 
     @Field(type = FieldType.Text, analyzer = "nori")
@@ -42,4 +44,7 @@ public class NewsDocument {
 
     @Field(type = FieldType.Text)
     private String url;
+
+    @Field(type = FieldType.Text)
+    private String thumbnailUrl;
 }

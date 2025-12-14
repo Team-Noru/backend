@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/news")
+@RequestMapping("/api/v1/search")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class NewsSearchController {
@@ -50,8 +50,8 @@ public class NewsSearchController {
 
     // 3. [기업별 뉴스] 특정 종목코드의 뉴스만 보고 싶을 때
     // 사용법: GET /api/news/company/005930
-    @GetMapping("/company/{code}")
-    public ResponseEntity<List<NewsDocument>> searchByCompany(@PathVariable("code") String code) {
+    @GetMapping("/company")
+    public ResponseEntity<List<NewsDocument>> searchByCompany(@RequestParam("code") String code) {
         List<NewsDocument> result = newsSearchService.searchByCompanyCode(code);
         return ResponseEntity.ok(result);
     }

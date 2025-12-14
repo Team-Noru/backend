@@ -20,7 +20,7 @@ public class CompanyDocument {
     private Long id;
 
     @Field(type = FieldType.Keyword)
-    private String stockCode;
+    private String companyId;
 
     @Field(type = FieldType.Text, analyzer = "nori")
     private String name;

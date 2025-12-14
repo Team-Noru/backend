@@ -70,7 +70,8 @@ public class NewsSearchService {
                 .publisher(dto.getPublisher())
                 .publishedAt(dto.getPublishedAt())
                 .companyCode(dto.getCompanyId())
-                .companyName(companyName) // 조회한 이름 매핑
+                .companyName(companyName)
+                .thumbnailUrl(dto.getThumbnailUrl())
                 .build();
 
         // 3. ES 저장

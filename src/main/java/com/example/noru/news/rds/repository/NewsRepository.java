@@ -10,11 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<News, Long> {
-    List<News> findByPublishedAtBetween(
+    List<News> findByPublishedAtBetweenOrderByPublishedAtDesc(
             LocalDateTime start,
             LocalDateTime end
     );
 
 
-    List<News> findByCompanyIdOrderByPublishedAtDesc(String stockCode);
+    List<News> findByCompanyIdOrderByPublishedAtDesc(String companyId);
+
+    List<News> findAllByOrderByPublishedAtDesc();
+
 }

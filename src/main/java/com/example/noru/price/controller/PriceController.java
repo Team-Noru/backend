@@ -1,5 +1,7 @@
 package com.example.noru.price.controller;
 
+import com.example.noru.common.response.ApiResponse;
+import com.example.noru.common.response.ResponseCode;
 import com.example.noru.company.rds.entity.Company;
 import com.example.noru.company.rds.repository.CompanyRepository;
 import com.example.noru.price.config.PriceParsingConfig;
@@ -8,6 +10,7 @@ import com.example.noru.price.dto.MajorDto;
 import com.example.noru.price.dto.PriceDto;
 import com.example.noru.price.service.PriceRedisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,9 +33,9 @@ public class PriceController {
 //    }
 
     @GetMapping
-    public List<MajorDto> getMajorStockPrices() {
+    public ResponseEntity<ApiResponse<List<MajorDto>>> getMajorStockPrices() {
 
-        return StockCode.CODES.stream()
+        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_PRICE, StockCode.CODES.stream()
                 .map(stockCode -> {
 
                     String json = priceRedisService.get(stockCode);
@@ -54,7 +57,7 @@ public class PriceController {
                             price.diffRate()
                     );
                 })
-                .toList();
+                .toList()));
     }
 
 }

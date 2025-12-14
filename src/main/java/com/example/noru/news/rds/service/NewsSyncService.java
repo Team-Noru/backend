@@ -60,7 +60,8 @@ public class NewsSyncService {
                             .publisher(news.getPublisher())
                             .publishedAt(news.getPublishedAt())
                             .companyCode(String.valueOf(news.getCompanyId())) // 필요하다면 stockCode로 변경 가능
-                            .companyName(companyName) // 👈 여기에 찾은 이름을 쏙 넣습니다!
+                            .companyName(companyName)
+                            .thumbnailUrl(news.getThumbnailUrl())
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -81,7 +82,7 @@ public class NewsSyncService {
         List<CompanyDocument> docs = allCompanies.stream()
                 .map(c -> CompanyDocument.builder()
                         .id(c.getId())
-                        .stockCode(c.getStockCode())
+                        .companyId(c.getStockCode())
                         .name(c.getName())
                         .isDomestic(c.isDomestic())
                         .isListed(c.isListed())
