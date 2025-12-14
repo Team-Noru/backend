@@ -22,6 +22,8 @@ public class NewsEsDto {
     // [중요] 기업 매핑을 위해 반드시 필요!
     private String companyId;
 
+    private String thumbnailUrl;
+
     // News 엔티티를 받아서 DTO로 변환하는 정적 메서드
     public static NewsEsDto from(News news) {
         return NewsEsDto.builder()
@@ -31,7 +33,8 @@ public class NewsEsDto {
                 .content(news.getContent())
                 .publishedAt(news.getPublishedAt()) // 시간 정보까지 그대로 전달
                 .publisher(news.getPublisher())
-                .companyId(news.getCompanyId())     // 필드 매핑 추가
+                .companyId(news.getCompanyId())
+                .thumbnailUrl(news.getThumbnailUrl())
                 .build();
     }
 }
