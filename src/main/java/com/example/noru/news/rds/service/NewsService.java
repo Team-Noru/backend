@@ -2,6 +2,8 @@ package com.example.noru.news.rds.service;
 
 import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ResponseCode;
+import com.example.noru.company.rds.entity.Company;
+import com.example.noru.company.rds.repository.CompanyRepository;
 import com.example.noru.news.rds.dto.NewsEsDto; // 아까 만든 DTO import 확인!
 import com.example.noru.news.rds.dto.response.CompanySentimentDto;
 import com.example.noru.news.rds.dto.response.NewsDetailDto;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ import java.util.List;
 public class NewsService {
 
     private final NewsRepository newsRepository;
+    private final CompanyRepository companyRepository;
     private final PriceRedisService priceRedisService;
 
     // [추가됨] Outbox 패턴을 위한 의존성 주입
@@ -120,30 +124,44 @@ public class NewsService {
         List<CompanySentimentDto> companies =
                 news.getCompanySentiments().stream()
                         .map(cs -> {
-                            // 회사 정보가 없을 경우에 대한 방어 로직이 필요하다면 여기에 추가
-                            if (cs.getCompany() == null) return null;
 
-                            String companyId = cs.getCompany().getStockCode();
-                            String json = priceRedisService.get(companyId);
+                            String companyPk = cs.getCompanyId();
 
+                            Optional<Company> companyOpt = companyRepository.findById(companyPk);
+
+                            if (companyOpt.isEmpty()) {
+                                return new CompanySentimentDto(
+                                        null,
+                                        null,
+                                        false,
+                                        false,
+                                        cs.getSentiment(),
+                                        0
+                                );
+                            }
+
+                            Company company = companyOpt.get();
+                            String stockCode = company.getStockCode();
+
+                            String json = priceRedisService.get(stockCode);
                             long price = 0;
-                            // Redis에 가격 정보가 없을 수 있으므로 예외 처리 (선택 사항)
                             if (json != null) {
-                                price = PriceParsingConfig.parsePrice(companyId, json).price();
+                                price = PriceParsingConfig.parsePrice(stockCode, json).price();
                             }
 
                             return new CompanySentimentDto(
-                                    companyId,
-                                    cs.getCompany().getName(),
-                                    cs.getCompany().isDomestic(),
-                                    cs.getCompany().isListed(),
+                                    stockCode,
+                                    company.getName(),
+                                    company.isDomestic(),
+                                    company.isListed(),
                                     cs.getSentiment(),
                                     price
                             );
                         })
-                        .filter(dto -> dto != null) // null 제거
+                        .filter(dto -> dto != null)
                         .toList();
 
         return NewsDetailDto.fromEntity(news, companies);
     }
+
 }
