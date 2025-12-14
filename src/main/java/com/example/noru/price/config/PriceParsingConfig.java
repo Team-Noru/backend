@@ -8,20 +8,32 @@ public class PriceParsingConfig {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static PriceDto parsePrice(String code, String json) {
+    public static PriceDto parsePrice(String stockCode, String json) {
         try {
             JsonNode root = mapper.readTree(json);
             JsonNode output = root.get("output");
 
-            if (output == null || output.get("stck_prpr") == null) {
-                return new PriceDto(code, -1);
+            if (output == null) {
+                return empty(stockCode);
             }
 
-            long price = output.get("stck_prpr").asLong();
-            return new PriceDto(code, price);
+            long price = output.path("stck_prpr").asLong(-1);
+            long diffPrice = output.path("prdy_vrss").asLong(0);
+            double diffRate = output.path("prdy_ctrt").asDouble(0.0);
+
+            return new PriceDto(
+                    stockCode,
+                    price,
+                    diffPrice,
+                    diffRate
+            );
 
         } catch (Exception e) {
-            return new PriceDto(code, -1); // 오류 시 -1
+            return empty(stockCode);
         }
+    }
+
+    private static PriceDto empty(String stockCode) {
+        return new PriceDto(stockCode, -1, 0, 0.0);
     }
 }

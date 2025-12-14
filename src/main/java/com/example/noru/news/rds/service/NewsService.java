@@ -13,6 +13,7 @@ import com.example.noru.news.rds.entity.OutboxEvent; // Outbox 엔티티 import
 import com.example.noru.news.rds.repository.NewsRepository;
 import com.example.noru.news.rds.repository.OutboxEventRepository; // Outbox 리포지토리 import
 import com.example.noru.price.config.PriceParsingConfig;
+import com.example.noru.price.dto.PriceDto;
 import com.example.noru.price.service.PriceRedisService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -136,17 +137,21 @@ public class NewsService {
                                         false,
                                         false,
                                         cs.getSentiment(),
+                                        -1,
+                                        0,
                                         0
+
                                 );
                             }
 
                             Company company = companyOpt.get();
                             String stockCode = company.getStockCode();
 
+                            PriceDto priceDto = new PriceDto(stockCode, -1, 0, 0.0);
+
                             String json = priceRedisService.get(stockCode);
-                            long price = 0;
                             if (json != null) {
-                                price = PriceParsingConfig.parsePrice(stockCode, json).price();
+                                priceDto = PriceParsingConfig.parsePrice(stockCode, json);
                             }
 
                             return new CompanySentimentDto(
@@ -155,8 +160,11 @@ public class NewsService {
                                     company.isDomestic(),
                                     company.isListed(),
                                     cs.getSentiment(),
-                                    price
+                                    priceDto.price(),
+                                    priceDto.diffPrice(),
+                                    priceDto.diffRate()
                             );
+
                         })
                         .filter(dto -> dto != null)
                         .toList();
