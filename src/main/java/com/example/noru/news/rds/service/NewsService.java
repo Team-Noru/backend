@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -89,7 +90,6 @@ public class NewsService {
             LocalDate localDate = LocalDate.parse(date);
             LocalDateTime start = localDate.atStartOfDay();
             LocalDateTime end = localDate.atTime(23, 59, 59);
-
             newsList = newsRepository.findByPublishedAtBetween(start, end);
         }
 
@@ -97,25 +97,43 @@ public class NewsService {
             throw new NewsException(ResponseCode.NEWS_NOT_FOUND);
         }
 
+        List<String> companyIds = newsList.stream()
+                .map(News::getCompanyId)
+                .filter(id -> id != null)
+                .distinct()
+                .toList();
+
+        List<Company> companies = companyRepository.findAllById(companyIds);
+
+        log.info(companyIds.toString());
+
+        var companyMap = companies.stream()
+                .collect(
+                        java.util.stream.Collectors.toMap(
+                                c -> c.getId().toString(),
+                                Company::getStockCode
+                        )
+                );
+        companyMap.forEach((companyId, stockCode) ->
+                log.info("🧩 companyId = {}, stockCode = {}", companyId, stockCode)
+        );
+
         return newsList.stream()
                 .map(news -> {
+                    String stockCode = companyMap.get(news.getCompanyId());
 
-                    String stockCode = null;
-
-                    if (news.getCompanyId() != null) {
-                        Company company = companyRepository
-                                .findById(news.getCompanyId())
-                                .orElse(null);
-
-                        if (company != null) {
-                            stockCode = company.getStockCode();
-                        }
-                    }
+                    log.info(
+                            "📰 newsId={}, news.companyId={}, mappedStockCode={}",
+                            news.getId(),
+                            news.getCompanyId(),
+                            stockCode
+                    );
 
                     return NewsListDto.fromEntity(news, stockCode);
                 })
                 .toList();
     }
+
 
     public List<NewsListDto> getNewsByCompanyId(String companyId) {
 
@@ -138,6 +156,7 @@ public class NewsService {
     }
 
     public NewsDetailDto getNewsDetail(Long newsId) {
+
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new NewsException(ResponseCode.NEWS_NOT_FOUND));
 
@@ -148,33 +167,39 @@ public class NewsService {
                     .orElse(null);
         }
 
+        List<String> sentimentCompanyIds = news.getCompanySentiments().stream()
+                .map(cs -> cs.getCompanyId())
+                .filter(id -> id != null)
+                .distinct()
+                .toList();
+
+        Map<String, Company> companyMap =
+                companyRepository.findAllById(sentimentCompanyIds)
+                        .stream()
+                        .collect(
+                                java.util.stream.Collectors.toMap(
+                                        c -> c.getId().toString(),
+                                        c -> c
+                                )
+                        );
+
         List<CompanySentimentDto> sentiments =
                 news.getCompanySentiments().stream()
                         .map(cs -> {
 
-                            String companyPk = cs.getCompanyId();
+                            Company company = companyMap.get(cs.getCompanyId());
 
-                            Optional<Company> companyOpt = companyRepository.findById(companyPk);
-
-                            if (companyOpt.isEmpty()) {
+                            if (company == null) {
                                 return new CompanySentimentDto(
-                                        null,
-                                        null,
-                                        false,
-                                        false,
+                                        null, null, false, false,
                                         cs.getSentiment(),
-                                        -1,
-                                        0,
-                                        0
-
+                                        -1, 0, 0
                                 );
                             }
 
-                            Company company = companyOpt.get();
                             String stockCode = company.getStockCode();
 
                             PriceDto priceDto = new PriceDto(stockCode, -1, 0, 0.0);
-
                             String json = priceRedisService.get(stockCode);
                             if (json != null) {
                                 priceDto = PriceParsingConfig.parsePrice(stockCode, json);
@@ -190,12 +215,9 @@ public class NewsService {
                                     priceDto.diffPrice(),
                                     priceDto.diffRate()
                             );
-
                         })
-                        .filter(dto -> dto != null)
                         .toList();
 
         return NewsDetailDto.fromEntity(news, mainCompany, sentiments);
     }
-
 }
