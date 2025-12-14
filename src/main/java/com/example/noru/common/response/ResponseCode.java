@@ -22,6 +22,7 @@ public enum ResponseCode {
 
     NEWS_NOT_FOUND("NEWS_NOT_FOUND", "뉴스 데이터가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     ANNOUNCEMENT_NOT_FOUND("ANNOUNCEMENT_NOT_FOUND", "해당 기업 공시 이슈가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    COMPANY_RELATION_NOT_FOUND("COMPANY_RELATION_NOT_FOUND", "연관 관계 기업이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 
     INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 

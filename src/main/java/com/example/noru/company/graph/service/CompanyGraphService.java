@@ -1,5 +1,7 @@
 package com.example.noru.company.graph.service;
 
+import com.example.noru.common.exception.CompanyException;
+import com.example.noru.common.response.ResponseCode;
 import com.example.noru.company.graph.dto.CompanyGraphResponseDto;
 import com.example.noru.company.graph.dto.RelatedCompanyBuilder;
 import com.example.noru.company.graph.dto.TagDto;
@@ -23,48 +25,19 @@ public class CompanyGraphService {
 
         CompanyGraphEntity root = companyGraphRepository
                 .findByTicker(ticker)
-                .orElseThrow(() -> new RuntimeException("기업 없음"));
+                .orElseThrow(() -> new CompanyException(ResponseCode.COMPANY_RELATION_NOT_FOUND));
 
         Map<String, RelatedCompanyBuilder> relatedMap = new LinkedHashMap<>();
 
-        for (CompanyGraphRelation relation : root.getRelations()) {
+        root.getOutgoingRelations().forEach(relation ->
+                processRelation(relation, relatedMap, true)
+        );
 
-            CompanyGraphEntity target = relation.getInvestor();
-            String companyKey = resolveCompanyKey(target);
 
-            relatedMap.computeIfAbsent(companyKey, key -> {
+        root.getIncomingRelations().forEach(relation ->
+                processRelation(relation, relatedMap, false)
+        );
 
-                boolean isListed =
-                        target.getTicker() != null && !target.getTicker().isBlank();
-
-                boolean isDomestic =
-                        target.getCountry() == null
-                                || "Korea".equalsIgnoreCase(target.getCountry());
-
-                return new RelatedCompanyBuilder(
-                        target.getTicker(),
-                        target.getName(),
-                        isDomestic,
-                        isListed
-                );
-            });
-
-            // ✅ 여기만 바뀜
-            String label =
-                    relation.getNewsId() != null
-                            ? "NEWS"
-                            : relation.getRelType();
-
-            relatedMap.get(companyKey).addTag(
-                    new TagDto(
-                            label,
-                            relation.getNewsId() != null
-                                    ? Long.parseLong(relation.getNewsId())
-                                    : null,
-                            relation.getRelReason()
-                    )
-            );
-        }
 
         return new CompanyGraphResponseDto(
                 root.getTicker(),
@@ -86,4 +59,54 @@ public class CompanyGraphService {
         }
         return "neo4j:" + entity.getId();
     }
+
+    private String resolveLabel(CompanyGraphRelation relation) {
+        return relation.getNewsId() != null
+                ? "NEWS"
+                : relation.getRelType();
+    }
+
+    private String resolveDirectionLabel(boolean isOutgoing) {
+        return isOutgoing ? "OUT" : "IN";
+    }
+
+
+    private void processRelation(
+            CompanyGraphRelation relation,
+            Map<String, RelatedCompanyBuilder> relatedMap,
+            boolean isOutgoing
+    ) {
+        CompanyGraphEntity target = relation.getInvestor();
+        String companyKey = resolveCompanyKey(target);
+
+        relatedMap.computeIfAbsent(companyKey, key -> {
+
+            boolean isListed =
+                    target.getTicker() != null && !target.getTicker().isBlank();
+
+            boolean isDomestic =
+                    target.getCountry() == null
+                            || "Korea".equalsIgnoreCase(target.getCountry());
+
+            return new RelatedCompanyBuilder(
+                    target.getTicker(),
+                    target.getName(),
+                    isDomestic,
+                    isListed
+            );
+        });
+
+        relatedMap.get(companyKey).addTag(
+                new TagDto(
+                        resolveLabel(relation),
+                        resolveDirectionLabel(isOutgoing),
+                        relation.getNewsId() != null
+                                ? Long.parseLong(relation.getNewsId())
+                                : null,
+                        relation.getRelReason()
+                )
+        );
+    }
+
+
 }

@@ -33,7 +33,10 @@ public class CompanyGraphEntity {
     private boolean isListed;
 
 
-    @Relationship(type = "RELATION")
-    private List<CompanyGraphRelation> relations;
+    @Relationship(type = "RELATION", direction = Relationship.Direction.OUTGOING)
+    private List<CompanyGraphRelation> outgoingRelations;
+
+    @Relationship(type = "RELATION", direction = Relationship.Direction.INCOMING)
+    private List<CompanyGraphRelation> incomingRelations;
 
 }
