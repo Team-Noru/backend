@@ -3,12 +3,11 @@ package com.example.noru.company.controller;
 import com.example.noru.common.response.ApiResponse;
 import com.example.noru.common.response.ResponseCode;
 import com.example.noru.company.graph.dto.CompanyGraphResponseDto;
-import com.example.noru.company.graph.node.CompanyGraphEntity;
 import com.example.noru.company.graph.service.CompanyGraphService;
 import com.example.noru.company.rds.dto.AnnouncementDto;
-import com.example.noru.company.rds.service.AnnouncementService;
+import com.example.noru.company.rds.dto.WordCloudDto;
+import com.example.noru.company.rds.service.CompanyService;
 import com.example.noru.news.rds.dto.response.NewsListDto;
-import com.example.noru.news.rds.entity.News;
 import com.example.noru.news.rds.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +25,13 @@ import java.util.List;
 @Slf4j
 public class CompanyController {
 
-    private final AnnouncementService announcementService;
     private final NewsService newsService;
     private final CompanyGraphService graphService;
+    private final CompanyService companyService;
 
     @GetMapping("/{companyId}/announcement")
     public ResponseEntity<?> getAnnouncements(@PathVariable String companyId) {
-        List<AnnouncementDto> result = announcementService.getAnnouncementsByCompany(companyId);
+        List<AnnouncementDto> result = companyService.getAnnouncementsByCompany(companyId);
 
         return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_ANNOUNCEMENT, result));
     }
@@ -46,5 +45,12 @@ public class CompanyController {
     public ResponseEntity<ApiResponse<CompanyGraphResponseDto>> getGraph(@PathVariable String ticker) {
         log.info("Request ticker = {}", ticker);
         return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_COMPANY_DETAIL, graphService.getCompanyGraph(ticker)));
+    }
+
+    @GetMapping("{companyId}/wordCloud")
+    public ResponseEntity<ApiResponse<WordCloudDto>> getWordCloud(@PathVariable String companyId) {
+        WordCloudDto result = companyService.getWordCloud(companyId);
+
+        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_WORD_CLOUD, result));
     }
 }
