@@ -14,7 +14,8 @@ import java.util.List;
 public class PriceScheduler {
 
     private final TokenService tokenService;
-    private final PriceFetchService fetchService;
+    private final PriceFetchService domesticFetchService;
+    private final OverseasPriceFetchService overseasFetchService;
     private final PriceRedisService priceRedisService;
     private final CompanyService companyService;
 
@@ -42,21 +43,54 @@ public class PriceScheduler {
 
         try {
             String token = tokenService.getAccessToken();
-            List<String> stockCodes = companyService.getDomesticListedCompanies();
 
-            for (String companyId : stockCodes) {
+            /* =========================
+             * 1️⃣ 국내 상장 기업
+             * ========================= */
+            List<String> domesticStockCodes =
+                    companyService.getDomesticListedCompanies(); // exchange = null
 
-                // ⏱ API 호출 속도 조절 (0.3초 간격)
+            for (String stockCode : domesticStockCodes) {
                 rateLimiter.acquire();
 
                 try {
-                    String json = fetchService.fetchPrice(token, companyId);
-                    priceRedisService.savePrice(companyId, json);
+                    String json = domesticFetchService.fetchPrice(token, stockCode);
+                    priceRedisService.saveDomestic(stockCode, json);
 
                 } catch (Exception e) {
-                    System.out.println("❌ Error fetching " + companyId + ": " + e.getMessage());
+                    System.out.println("❌ Domestic fetch error " + stockCode + ": " + e.getMessage());
                 }
             }
+
+            /* =========================
+             * 2️⃣ 해외 상장 기업
+             * ========================= */
+            companyService.getOverseasListedCompanies() // exchange != null
+                    .forEach(company -> {
+
+                        rateLimiter.acquire();
+
+                        try {
+                            String json = overseasFetchService.fetch(
+                                    token,
+                                    company.getExchange(),      // BAY, BAQ, HKS …
+                                    company.getStockCode()
+                            );
+
+                            priceRedisService.saveOverseas(
+                                    company.getExchange(),
+                                    company.getStockCode(),
+                                    json
+                            );
+
+                        } catch (Exception e) {
+                            System.out.println(
+                                    "❌ Overseas fetch error "
+                                            + company.getExchange() + ":" + company.getStockCode()
+                                            + " → " + e.getMessage()
+                            );
+                        }
+                    });
 
         } finally {
             isRunning = false;
