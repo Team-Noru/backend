@@ -11,7 +11,7 @@ public interface CompanyGraphRepository
 
     @Query("""
     MATCH (e:Entity {ticker: $id})
-    OPTIONAL MATCH (e)<-[r:RELATION]-(t:Entity)
+    OPTIONAL MATCH (e)-[r:RELATION]-(t:Entity)
     RETURN e, collect(r) AS relations, collect(t) AS targets
     """)
     Optional<CompanyGraphEntity> findByTicker(String id);
