@@ -4,6 +4,8 @@ import com.example.noru.news.rds.entity.News;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class NewsEsDto {
@@ -11,8 +13,14 @@ public class NewsEsDto {
     private String title;
     private String description;
     private String content;
-    private String publishedAt;
+
+    // String 대신 LocalDateTime 사용 추천 (시간 정보 유지)
+    private LocalDateTime publishedAt;
+
     private String publisher;
+
+    // [중요] 기업 매핑을 위해 반드시 필요!
+    private String companyId;
 
     // News 엔티티를 받아서 DTO로 변환하는 정적 메서드
     public static NewsEsDto from(News news) {
@@ -21,10 +29,9 @@ public class NewsEsDto {
                 .title(news.getTitle())
                 .description(news.getDescription())
                 .content(news.getContent())
-                .publishedAt(news.getPublishedAt()
-                        .toLocalDate()
-                        .toString())
+                .publishedAt(news.getPublishedAt()) // 시간 정보까지 그대로 전달
                 .publisher(news.getPublisher())
+                .companyId(news.getCompanyId())     // 필드 매핑 추가
                 .build();
     }
 }
