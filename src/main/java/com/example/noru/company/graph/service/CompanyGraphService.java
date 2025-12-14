@@ -8,7 +8,10 @@ import com.example.noru.company.graph.dto.TagDto;
 import com.example.noru.company.graph.node.CompanyGraphEntity;
 import com.example.noru.company.graph.relationship.CompanyGraphRelation;
 import com.example.noru.company.graph.repository.CompanyGraphRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +20,11 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CompanyGraphService {
 
     private final CompanyGraphRepository companyGraphRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public CompanyGraphResponseDto getCompanyGraph(String ticker) {
 
@@ -70,6 +75,24 @@ public class CompanyGraphService {
         return isOutgoing ? "OUT" : "IN";
     }
 
+    private String resolveRelReason(CompanyGraphRelation relation) {
+
+        if (relation.getExtraJson() != null && !relation.getExtraJson().isBlank()) {
+            try {
+                JsonNode root = objectMapper.readTree(relation.getExtraJson());
+                JsonNode reasonNode = root.get("reason");
+
+                if (reasonNode != null && !reasonNode.isNull()) {
+                    return reasonNode.asText();
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse extra_json: {}", relation.getExtraJson(), e);
+            }
+        }
+
+        return relation.getRelReason();
+    }
+
 
     private void processRelation(
             CompanyGraphRelation relation,
@@ -103,7 +126,7 @@ public class CompanyGraphService {
                         relation.getNewsId() != null
                                 ? Long.parseLong(relation.getNewsId())
                                 : null,
-                        relation.getRelReason()
+                        resolveRelReason(relation)
                 )
         );
     }
