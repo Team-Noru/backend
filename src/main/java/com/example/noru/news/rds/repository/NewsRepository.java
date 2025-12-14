@@ -16,5 +16,5 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     );
 
 
-    List<News> findByCompanyIdOrderByPublishedAtDesc(String stockCode);
+    List<News> findByCompanyIdOrderByPublishedAtDesc(String companyId);
 }

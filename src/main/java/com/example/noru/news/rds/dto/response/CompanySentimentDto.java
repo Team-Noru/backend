@@ -1,7 +1,7 @@
 package com.example.noru.news.rds.dto.response;
 
 public record CompanySentimentDto(
-        String stockCode,
+        String companyId,
         String companyName,
         boolean isDomestic,
         boolean isListed,

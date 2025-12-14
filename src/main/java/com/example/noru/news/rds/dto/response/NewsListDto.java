@@ -13,10 +13,10 @@ public record NewsListDto (
     String publisher,
     String thumbnailUrl
 ) {
-    public static NewsListDto fromEntity(News news) {
+    public static NewsListDto fromEntity(News news, String stockCode) {
         return new NewsListDto(
                 news.getId(),
-                news.getCompanyId(),
+                stockCode,
                 news.getTitle(),
                 news.getDescription(),
                 news.getPublishedAt()

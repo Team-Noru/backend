@@ -80,41 +80,60 @@ public class NewsService {
     // =================================================================
 
     public List<NewsListDto> getAllNews(String date) {
-        List<NewsListDto> result;
+
+        List<News> newsList;
 
         if (date == null || date.isBlank()) {
-            result = newsRepository.findAll().stream()
-                    .map(NewsListDto::fromEntity)
-                    .toList();
+            newsList = newsRepository.findAll();
         } else {
             LocalDate localDate = LocalDate.parse(date);
-
             LocalDateTime start = localDate.atStartOfDay();
             LocalDateTime end = localDate.atTime(23, 59, 59);
 
-            result = newsRepository.findByPublishedAtBetween(start, end)
-                    .stream()
-                    .map(NewsListDto::fromEntity)
-                    .toList();
+            newsList = newsRepository.findByPublishedAtBetween(start, end);
         }
 
-        if (result.isEmpty()) {
+        if (newsList.isEmpty()) {
             throw new NewsException(ResponseCode.NEWS_NOT_FOUND);
         }
 
-        return result;
+        return newsList.stream()
+                .map(news -> {
+
+                    String stockCode = null;
+
+                    if (news.getCompanyId() != null) {
+                        Company company = companyRepository
+                                .findById(news.getCompanyId())
+                                .orElse(null);
+
+                        if (company != null) {
+                            stockCode = company.getStockCode();
+                        }
+                    }
+
+                    return NewsListDto.fromEntity(news, stockCode);
+                })
+                .toList();
     }
 
     public List<NewsListDto> getNewsByCompanyId(String companyId) {
 
-        List<News> news = newsRepository.findByCompanyIdOrderByPublishedAtDesc(companyId);
+        Company company = companyRepository.findByStockCode(companyId)
+                .orElseThrow(() -> new NewsException(ResponseCode.NEWS_NOT_FOUND));
 
-        if (news.isEmpty()) {
+        Long id = company.getId();
+        String stockCode = company.getStockCode();
+
+        List<News> newsList =
+                newsRepository.findByCompanyIdOrderByPublishedAtDesc(String.valueOf(id));
+
+        if (newsList.isEmpty()) {
             throw new NewsException(ResponseCode.NEWS_NOT_FOUND);
         }
 
-        return news.stream()
-                .map(NewsListDto::fromEntity)
+        return newsList.stream()
+                .map(news -> NewsListDto.fromEntity(news, stockCode))
                 .toList();
     }
 
@@ -122,7 +141,14 @@ public class NewsService {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new NewsException(ResponseCode.NEWS_NOT_FOUND));
 
-        List<CompanySentimentDto> companies =
+        Company mainCompany = null;
+        if (news.getCompanyId() != null) {
+            mainCompany = companyRepository
+                    .findById(news.getCompanyId())
+                    .orElse(null);
+        }
+
+        List<CompanySentimentDto> sentiments =
                 news.getCompanySentiments().stream()
                         .map(cs -> {
 
@@ -169,7 +195,7 @@ public class NewsService {
                         .filter(dto -> dto != null)
                         .toList();
 
-        return NewsDetailDto.fromEntity(news, companies);
+        return NewsDetailDto.fromEntity(news, mainCompany, sentiments);
     }
 
 }

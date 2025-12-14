@@ -1,5 +1,6 @@
 package com.example.noru.news.rds.dto.response;
 
+import com.example.noru.company.rds.entity.Company;
 import com.example.noru.news.rds.entity.News;
 import com.example.noru.news.rds.entity.NewsImage;
 
@@ -21,6 +22,7 @@ public record NewsDetailDto(
 ) {
     public static NewsDetailDto fromEntity(
             News news,
+            Company mainCompany,
             List<CompanySentimentDto> companies
     ) {
         List<String> images = news.getImages().stream()
@@ -40,7 +42,7 @@ public record NewsDetailDto(
                 news.getThumbnailUrl(),
                 images,
                 news.getPublisher(),
-                news.getCompanyId(),
+                mainCompany.getStockCode(),
                 companies
         );
     }
