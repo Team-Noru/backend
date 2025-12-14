@@ -1,13 +1,13 @@
-package com.example.noru.common.scheduler;
+package com.example.noru.common.sheduler;
 
+import com.example.noru.news.rds.dto.NewsEsDto;
+import com.example.noru.news.rds.entity.News;
 import com.example.noru.news.rds.entity.OutboxEvent;
 import com.example.noru.news.rds.repository.OutboxEventRepository;
+import com.example.noru.news.rds.service.NewsSearchService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
-import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,37 +20,32 @@ import java.util.List;
 public class OutboxEventScheduler {
 
     private final OutboxEventRepository outboxEventRepository;
-    private final ElasticsearchOperations elasticsearchOperations;
+    private final NewsSearchService newsSearchService;
+    private final ObjectMapper objectMapper;
 
-    @Scheduled(fixedDelay = 1000) // 1초마다 실행
+    @Scheduled(fixedDelay = 2000)
     @Transactional
     public void processOutboxEvents() {
-        // PENDING 상태인 이벤트 조회
+        // 1. PENDING 이벤트 조회
         List<OutboxEvent> events = outboxEventRepository.findAllByStatus("PENDING");
 
         if (events.isEmpty()) return;
 
         for (OutboxEvent event : events) {
             try {
-                // aggregateType에 따라 인덱스 이름 결정
-                // NEWS -> news_index
-                // COMPANY -> company_index (자동으로 소문자 변환되어 매핑됨)
-                String indexName = event.getAggregateType().toLowerCase() + "_index";
+                if ("NEWS".equals(event.getAggregateType())) {
+                    // [수정됨] JSON -> NewsEsDto 변환 (NewsEntity가 아님!)
+                    NewsEsDto dto = objectMapper.readValue(event.getPayload(), NewsEsDto.class);
 
-                // ES 쿼리 생성
-                IndexQuery indexQuery = new IndexQueryBuilder()
-                        .withId(event.getAggregateId().toString())
-                        .withSource(event.getPayload())
-                        .build();
+                    // Service로 전달
+                    newsSearchService.saveToElasticsearch(dto);
+                }
 
-                // ES로 전송
-                elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
-
-                // 성공 시 상태 변경
+                // 성공 처리
                 event.changeStatus("PUBLISHED");
 
             } catch (Exception e) {
-                log.error("이벤트 전송 실패 ID: {}", event.getId(), e);
+                log.error("이벤트 처리 실패 ID: {}", event.getId(), e);
             }
         }
     }
