@@ -24,18 +24,19 @@ public class CompanyGraphEntity {
 
     private String name;
 
-    private String market;
-
-    @Property("market_cap_eok")
-    private Double marketCapEok;
-
-    @Property("cap_bucket")
-    private String capBucket;
-
     @Property("entity_type")
     private String entityType;
 
+    private String country;
+
+    @Property("is_listed")
+    private boolean isListed;
+
+
+    @Relationship(type = "RELATION", direction = Relationship.Direction.OUTGOING)
+    private List<CompanyGraphRelation> outgoingRelations;
+
     @Relationship(type = "RELATION", direction = Relationship.Direction.INCOMING)
-    private List<CompanyGraphRelation> relations;
+    private List<CompanyGraphRelation> incomingRelations;
 
 }

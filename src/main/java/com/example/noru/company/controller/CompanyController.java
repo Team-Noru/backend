@@ -2,6 +2,7 @@ package com.example.noru.company.controller;
 
 import com.example.noru.common.response.ApiResponse;
 import com.example.noru.common.response.ResponseCode;
+import com.example.noru.company.graph.dto.CompanyGraphResponseDto;
 import com.example.noru.company.graph.node.CompanyGraphEntity;
 import com.example.noru.company.graph.service.CompanyGraphService;
 import com.example.noru.company.rds.dto.AnnouncementDto;
@@ -41,9 +42,9 @@ public class CompanyController {
         return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_NEWS_COMPANY, newsService.getNewsByCompanyId(companyId)));
     }
 
-    @GetMapping("/{corpCode}")
-    public CompanyGraphEntity getGraph(@PathVariable String corpCode) {
-        log.info("Request corpCode = {}", corpCode);
-        return graphService.getCompanyGraph(corpCode);
+    @GetMapping("/{ticker}")
+    public ResponseEntity<ApiResponse<CompanyGraphResponseDto>> getGraph(@PathVariable String ticker) {
+        log.info("Request ticker = {}", ticker);
+        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_COMPANY_DETAIL, graphService.getCompanyGraph(ticker)));
     }
 }
