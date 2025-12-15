@@ -14,7 +14,7 @@ public class PriceRedisService {
     private static final String PREFIX = "price:";
 
     // TTL 정책
-    private static final long DOMESTIC_TTL_SEC = 60;
+    private static final long DOMESTIC_TTL_SEC = 120;
     private static final long OVERSEAS_TTL_SEC = 60 * 60 * 24; // 24h
 
     /* =========================
