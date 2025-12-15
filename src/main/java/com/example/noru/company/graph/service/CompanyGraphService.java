@@ -82,9 +82,7 @@ public class CompanyGraphService {
     }
 
     private String resolveLabel(CompanyGraphRelation relation) {
-        return relation.getNewsId() != null
-                ? "NEWS"
-                : relation.getRelType();
+        return relation.getRelType();
     }
 
     private String resolveDirectionLabel(boolean isOutgoing) {
