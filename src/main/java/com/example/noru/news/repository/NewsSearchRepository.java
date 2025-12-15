@@ -16,22 +16,22 @@ public interface NewsSearchRepository extends ElasticsearchRepository<NewsDocume
     // 회사 코드로 검색
     List<NewsDocument> findByCompanyCode(String companyCode);
 
-    @Query("""
-        {
-          "bool": {
-            "must": [
-              {
-                "multi_match": {
-                  "query": "?0",
-                  "fields": ["title^3", "content", "companyName"]
-                }
-              }
-            ]
-          },
-          "collapse": {
-            "field": "title.keyword"
-          }
-        }
-    """)
-    List<NewsDocument> searchByKeyword(String keyword);
+//    @Query("""
+//        {
+//          "bool": {
+//            "must": [
+//              {
+//                "multi_match": {
+//                  "query": "?0",
+//                  "fields": ["title^3", "content", "companyName"]
+//                }
+//              }
+//            ]
+//          },
+//          "collapse": {
+//            "field": "title.keyword"
+//          }
+//        }
+//    """)
+//    List<NewsDocument> searchByKeyword(String keyword);
 }
