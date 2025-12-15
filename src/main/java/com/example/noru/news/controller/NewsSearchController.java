@@ -2,6 +2,7 @@ package com.example.noru.news.controller;
 
 import com.example.noru.company.document.CompanyDocument;
 import com.example.noru.company.rds.repository.CompanySearchRepository;
+import com.example.noru.company.rds.service.CompanySearchService;
 import com.example.noru.news.document.NewsDocument;
 import com.example.noru.news.rds.dto.SearchResponseDto;
 import com.example.noru.news.rds.service.NewsSearchService;
@@ -19,7 +20,7 @@ import java.util.List;
 public class NewsSearchController {
 
     private final NewsSearchService newsSearchService;
-    private final CompanySearchRepository companySearchRepository;
+    private final CompanySearchService companySearchService;
 
     // 1. [통합 검색] 뉴스(제목+내용+기업명) + 기업(이름+코드) 동시에 검색
     // 사용법: GET /api/news/total?keyword=삼성
@@ -30,7 +31,7 @@ public class NewsSearchController {
         List<NewsDocument> newsResult = newsSearchService.searchGlobal(keyword);
 
         // 1-2. 기업 검색 (기업명 + 종목코드)
-        List<CompanyDocument> companyResult = companySearchRepository.searchByNameOrCode(keyword);
+        List<CompanyDocument> companyResult = companySearchService.searchByNameOrCode(keyword);
 
         // 1-3. 결과 묶어서 반환
         SearchResponseDto response = SearchResponseDto.builder()
