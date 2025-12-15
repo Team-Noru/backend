@@ -26,8 +26,10 @@ public class CompanyDocument {
     private String name;
 
     @Field(type = FieldType.Boolean)
+    @JsonProperty("isDomestic")
     private boolean isDomestic;
 
     @Field(type = FieldType.Boolean)
+    @JsonProperty("isListed")
     private boolean isListed;
 }
