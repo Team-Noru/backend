@@ -1,5 +1,6 @@
 package com.example.noru.news.rds.service;
 
+import co.elastic.clients.elasticsearch.core.search.FieldCollapse;
 import com.example.noru.company.rds.entity.Company;
 import com.example.noru.company.rds.repository.CompanyRepository;
 import com.example.noru.news.document.NewsDocument;
@@ -7,11 +8,16 @@ import com.example.noru.news.rds.dto.NewsEsDto;
 import com.example.noru.news.rds.entity.News;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +26,7 @@ public class NewsSearchService {
 
     private final com.example.noru.news.repository.NewsSearchRepository newsSearchRepository;
     private final CompanyRepository companyRepository;
+    private final ElasticsearchOperations elasticsearchOperations;
 
     /**
      * 1. 통합 검색 (Global Search)
@@ -29,8 +36,22 @@ public class NewsSearchService {
      */
     @Transactional(readOnly = true)
     public List<NewsDocument> searchGlobal(String keyword) {
-        // Repository에 @Query로 정의해둔 multi_match 쿼리를 실행합니다.
-        return newsSearchRepository.searchByKeyword(keyword);
+
+        Query query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .multiMatch(m -> m
+                                .fields("title^3", "content", "companyName")
+                                .query(keyword)
+                        )
+                )
+                .withFieldCollapse(FieldCollapse.of(f -> f.field("title.keyword")))
+                .build();
+
+        SearchHits<NewsDocument> searchHits = elasticsearchOperations.search(query, NewsDocument.class);
+
+        return searchHits.stream()
+                .map(hit -> hit.getContent())
+                .collect(Collectors.toList());
     }
 
     /**
