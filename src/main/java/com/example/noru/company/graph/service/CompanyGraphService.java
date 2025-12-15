@@ -1,6 +1,7 @@
 package com.example.noru.company.graph.service;
 
 import com.example.noru.common.exception.CompanyException;
+import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ResponseCode;
 import com.example.noru.company.graph.dto.CompanyGraphResponseDto;
 import com.example.noru.company.graph.dto.RelatedCompanyBuilder;
@@ -8,6 +9,12 @@ import com.example.noru.company.graph.dto.TagDto;
 import com.example.noru.company.graph.node.CompanyGraphEntity;
 import com.example.noru.company.graph.relationship.CompanyGraphRelation;
 import com.example.noru.company.graph.repository.CompanyGraphRepository;
+import com.example.noru.company.rds.entity.Company;
+import com.example.noru.company.rds.repository.CompanyRepository;
+import com.example.noru.price.config.PriceParsingConfig;
+import com.example.noru.price.dto.PriceDto;
+import com.example.noru.price.service.PriceGraphService;
+import com.example.noru.price.service.PriceRedisService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +32,18 @@ import java.util.Map;
 public class CompanyGraphService {
 
     private final CompanyGraphRepository companyGraphRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final CompanyRepository companyRepository;
+    private final PriceGraphService priceGraphService;
+    private final ObjectMapper objectMapper;
+
 
     public CompanyGraphResponseDto getCompanyGraph(String ticker) {
 
         CompanyGraphEntity root = companyGraphRepository
                 .findByTicker(ticker)
                 .orElseThrow(() -> new CompanyException(ResponseCode.COMPANY_RELATION_NOT_FOUND));
+
+        PriceDto priceDto = priceGraphService.getPrice(ticker);
 
         Map<String, RelatedCompanyBuilder> relatedMap = new LinkedHashMap<>();
 
@@ -48,6 +61,9 @@ public class CompanyGraphService {
                 root.getTicker(),
                 root.getName(),
                 root.isListed(),
+                priceDto.price(),
+                priceDto.diffPrice(),
+                priceDto.diffRate(),
                 relatedMap.values()
                         .stream()
                         .map(RelatedCompanyBuilder::build)
