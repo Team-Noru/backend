@@ -35,29 +35,52 @@ public class PriceController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<MajorDto>>> getMajorStockPrices() {
 
-        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_PRICE, StockCode.CODES.stream()
-                .map(stockCode -> {
+        List<MajorDto> result =
+                StockCode.CODES.stream()
+                        .map(stockCode -> {
 
-                    String json = priceRedisService.get(stockCode);
-                    PriceDto price = json != null
-                            ? PriceParsingConfig.parsePrice(stockCode, json)
-                            : new PriceDto(stockCode, -1, 0, 0.0);
+                            // 1️⃣ 회사 조회
+                            Company company = companyRepository
+                                    .findAllByStockCode(stockCode)
+                                    .stream()
+                                    .findFirst()
+                                    .orElse(null);
 
-                    Company company = companyRepository
-                            .findAllByStockCode(stockCode)
-                            .stream()
-                            .findFirst()
-                            .orElse(null);
+                            if (company == null) {
+                                return new MajorDto(
+                                        stockCode,
+                                        null,
+                                        -1,
+                                        0,
+                                        0.0
+                                );
+                            }
 
-                    return new MajorDto(
-                            stockCode,
-                            company != null ? company.getName() : null,
-                            price.price(),
-                            price.diffPrice(),
-                            price.diffRate()
-                    );
-                })
-                .toList()));
+                            // 2️⃣ Redis 조회 (exchange 기준)
+                            String json = priceRedisService.get(
+                                    company.getExchange(),   // null이면 DOMESTIC
+                                    company.getStockCode()
+                            );
+
+                            // 3️⃣ 가격 파싱
+                            PriceDto price = json != null
+                                    ? PriceParsingConfig.parsePrice(stockCode, json)
+                                    : new PriceDto(stockCode, -1, 0, 0.0);
+
+                            // 4️⃣ 응답 DTO
+                            return new MajorDto(
+                                    stockCode,
+                                    company.getName(),
+                                    price.price(),
+                                    price.diffPrice(),
+                                    price.diffRate()
+                            );
+                        })
+                        .toList();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(ResponseCode.SUCCESS_PRICE, result)
+        );
     }
 
 }

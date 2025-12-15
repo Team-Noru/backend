@@ -26,4 +26,6 @@ public class Company {
     private boolean isDomestic;
 
     private boolean isListed;
+
+    private String exchange;
 }

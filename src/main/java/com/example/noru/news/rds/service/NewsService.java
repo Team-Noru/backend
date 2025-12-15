@@ -189,9 +189,11 @@ public class NewsService {
                             }
 
                             String stockCode = company.getStockCode();
+                            String exchange = company.getExchange(); // null 이면 국내
 
                             PriceDto priceDto = new PriceDto(stockCode, -1, 0, 0.0);
-                            String json = priceRedisService.get(stockCode);
+
+                            String json = priceRedisService.get(exchange, stockCode);
                             if (json != null) {
                                 priceDto = PriceParsingConfig.parsePrice(stockCode, json);
                             }
