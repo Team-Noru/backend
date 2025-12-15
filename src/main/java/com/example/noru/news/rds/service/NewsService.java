@@ -129,7 +129,7 @@ public class NewsService {
     public List<NewsListDto> getNewsByCompanyId(String companyId) {
 
         Company company = companyRepository.findByStockCode(companyId)
-                .orElseThrow(() -> new NewsException(ResponseCode.NEWS_NOT_FOUND));
+                .orElseThrow(() -> new NewsException(ResponseCode.COMPANY_NOT_FOUND));
 
         Long id = company.getId();
         String stockCode = company.getStockCode();
