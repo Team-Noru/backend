@@ -19,4 +19,6 @@ public interface CompanyRepository extends JpaRepository<Company, String> {
     List<Company> findAllByStockCode(String stockCode);
 
     Optional<Company> findByStockCode(String companyId);
+
+    List<Company> findByIsDomesticFalseAndIsListedTrueAndExchangeIsNotNull();
 }

@@ -9,17 +9,38 @@ public class PriceParsingConfig {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public static PriceDto parsePrice(String stockCode, String json) {
+
         try {
             JsonNode root = mapper.readTree(json);
-            JsonNode output = root.get("output");
 
-            if (output == null) {
-                return empty(stockCode);
+            // =========================
+            // 1️⃣ 해외 (output.t_xprc 존재)
+            // =========================
+            JsonNode output = root.get("output");
+            if (output != null && output.has("t_xprc")) {
+
+                int price = output.get("t_xprc").asInt();
+                int diffPrice = output.get("t_xdif").asInt();
+
+                String rateStr = output.get("t_xrat").asText(); // "+0.58"
+                double diffRate = Double.parseDouble(rateStr.replace("+", ""));
+
+                return new PriceDto(
+                        stockCode,
+                        price,
+                        diffPrice,
+                        diffRate
+                );
             }
 
-            long price = output.path("stck_prpr").asLong(-1);
-            long diffPrice = output.path("prdy_vrss").asLong(0);
-            double diffRate = output.path("prdy_ctrt").asDouble(0.0);
+            // =========================
+            // 2️⃣ 국내 (기존 로직 유지)
+            // =========================
+            JsonNode outputNode = root.path("output");
+
+            int price = outputNode.path("stck_prpr").asInt();
+            int diffPrice = outputNode.path("prdy_vrss").asInt();
+            double diffRate = outputNode.path("prdy_ctrt").asDouble();
 
             return new PriceDto(
                     stockCode,
@@ -29,11 +50,7 @@ public class PriceParsingConfig {
             );
 
         } catch (Exception e) {
-            return empty(stockCode);
+            throw new RuntimeException("Price JSON parsing error", e);
         }
-    }
-
-    private static PriceDto empty(String stockCode) {
-        return new PriceDto(stockCode, -1, 0, 0.0);
     }
 }
