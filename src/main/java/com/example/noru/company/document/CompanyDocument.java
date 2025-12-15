@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Getter
 @Builder
@@ -26,8 +27,10 @@ public class CompanyDocument {
     private String name;
 
     @Field(type = FieldType.Boolean)
+    @JsonProperty("isDomestic")
     private boolean isDomestic;
 
     @Field(type = FieldType.Boolean)
+    @JsonProperty("isListed")
     private boolean isListed;
 }
