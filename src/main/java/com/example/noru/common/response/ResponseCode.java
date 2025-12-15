@@ -23,6 +23,7 @@ public enum ResponseCode {
 
 
     NEWS_NOT_FOUND("NEWS_NOT_FOUND", "뉴스 데이터가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    COMPANY_NOT_FOUND("COMPANY_NOT_FOUND", "기업이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     ANNOUNCEMENT_NOT_FOUND("ANNOUNCEMENT_NOT_FOUND", "해당 기업 공시 이슈가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     COMPANY_RELATION_NOT_FOUND("COMPANY_RELATION_NOT_FOUND", "연관 관계 기업이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     WORD_CLOUD_NOT_FOUND("WORD_CLOUD_NOT_FOUND", "워드클라우드 데이터가 없습니다.", HttpStatus.NOT_FOUND),
