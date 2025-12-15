@@ -6,6 +6,7 @@ import com.example.noru.news.document.NewsDocument;
 import com.example.noru.news.rds.dto.SearchResponseDto;
 import com.example.noru.news.rds.service.NewsSearchService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
