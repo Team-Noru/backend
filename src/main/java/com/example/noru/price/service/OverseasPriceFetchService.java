@@ -25,15 +25,16 @@ public class OverseasPriceFetchService {
         log.info("🌍 Overseas price fetch [{}:{}]", exchange, stockCode);
 
         return restClient.get()
-                .uri(baseUrl + "/uapi/overseas-stock/v1/quotations/price",
+                .uri(baseUrl + "/uapi/overseas-price/v1/quotations/price-detail",
                         uri -> uri
+                                .queryParam("AUTH")
                                 .queryParam("EXCD", exchange)
                                 .queryParam("SYMB", stockCode)
                                 .build())
                 .header("authorization", "Bearer " + token)
                 .header("appkey", appKey)
                 .header("appsecret", appSecret)
-                .header("tr_id", "HHDFS00000300")
+                .header("tr_id", "HHDFS76200200")
                 .retrieve()
                 .body(String.class);
     }
