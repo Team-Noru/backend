@@ -24,6 +24,9 @@ public class CompanyGraphRelation {
     @Property("extra_json")
     private String extraJson;
 
+    @Property("source_json")
+    private String sourceJson;
+
     @Property("news_id")
     private String newsId;
 

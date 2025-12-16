@@ -105,6 +105,10 @@ public class CompanyGraphService {
         return relation.getRelType();
     }
 
+    private String resolveEventType(CompanyGraphRelation relation) {
+        return relation.getEventType();
+    }
+
     private String resolveDirectionLabel(boolean isOutgoing) {
         return isOutgoing ? "OUT" : "IN";
     }
@@ -197,6 +201,56 @@ public class CompanyGraphService {
         }
     }
 
+    private String buildOtherInvestmentReason(CompanyGraphRelation relation) {
+
+        if (relation.getSourceJson() == null || relation.getSourceJson().isBlank()) {
+            return relation.getRelReason();
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(relation.getSourceJson());
+            JsonNode props = root.path("properties");
+
+            String sourceName = root.path("source_name").asText("투자자");
+            String targetName = root.path("target_name").asText("피투자회사");
+
+            double stake = props.path("stake_ratio").asDouble(0.0);
+            String purpose = props.path("purpose").asText("");
+
+            boolean isManagement =
+                    purpose.contains("경영");
+
+            StringBuilder sb = new StringBuilder();
+
+            if (isManagement) {
+                sb.append(sourceName)
+                        .append("→")
+                        .append(targetName)
+                        .append("에 지분 ")
+                        .append(stake)
+                        .append("%를 투자하며 경영에 참여");
+            } else {
+                sb.append(sourceName)
+                        .append("→")
+                        .append(targetName)
+                        .append("에 지분 ")
+                        .append(stake)
+                        .append("%를 투자");
+            }
+
+            sb.append("하여\n")
+                    .append(purpose.isBlank() ? "투자" : purpose)
+                    .append(" 목적의 관계를 형성");
+
+            return sb.toString();
+
+        } catch (Exception e) {
+            log.warn("Failed to build OTR_INVEST reason: {}", relation.getSourceJson(), e);
+            return relation.getRelReason();
+        }
+    }
+
+
 
 
     private void processRelation(
@@ -225,15 +279,19 @@ public class CompanyGraphService {
         });
 
         String label = resolveLabel(relation);
+        String eventType = resolveEventType(relation);
 
         String reason;
-        if ("IPO_DILUTION".equals(label)) {
+        if ("IPO_DILUTION".equals(eventType)) {
             reason = buildIpoDilutionReason(relation);
-        } else if ("CAPITAL_INCREASE".equals(label)) {
+        } else if ("CAPITAL_INCREASE".equals(eventType)) {
             reason = buildCapitalIncreaseReason(relation);
+        } else if ("OTR_INVEST".equals(eventType)) {
+            reason = buildOtherInvestmentReason(relation);
         } else {
             reason = resolveRelReason(relation);
         }
+
 
 
         relatedMap.get(companyKey).addTag(
