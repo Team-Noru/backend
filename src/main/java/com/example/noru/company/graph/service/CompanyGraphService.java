@@ -204,8 +204,7 @@ public class CompanyGraphService {
                         relation.getNewsId() != null
                                 ? Long.parseLong(relation.getNewsId())
                                 : null,
-                        reason,
-                        null   // extra 안 씀
+                        reason
                 )
         );
     }
