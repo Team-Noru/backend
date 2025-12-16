@@ -162,6 +162,42 @@ public class CompanyGraphService {
         }
     }
 
+    private String buildCapitalIncreaseReason(CompanyGraphRelation relation) {
+
+        if (relation.getExtraJson() == null || relation.getExtraJson().isBlank()) {
+            return relation.getRelReason();
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(relation.getExtraJson());
+
+            String relationRaw = root.path("relation_raw").asText("관계자");
+            String assignedSharesRaw = root.path("assigned_shares_raw").asText();
+            String reason = root.path("reason").asText("");
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(relationRaw)
+                    .append("가 유상증자에 참여하여 ");
+
+            if (!assignedSharesRaw.isBlank()) {
+                sb.append("신주 ").append(assignedSharesRaw).append("주를 배정받음");
+            } else {
+                sb.append("신주를 배정받음");
+            }
+
+            if (!reason.isBlank()) {
+                sb.append("\n(참여 사유: ").append(reason).append(")");
+            }
+
+            return sb.toString();
+
+        } catch (Exception e) {
+            log.warn("Failed to build CAPITAL_INCREASE reason: {}", relation.getExtraJson(), e);
+            return relation.getRelReason();
+        }
+    }
+
+
 
     private void processRelation(
             CompanyGraphRelation relation,
@@ -193,9 +229,12 @@ public class CompanyGraphService {
         String reason;
         if ("IPO_DILUTION".equals(label)) {
             reason = buildIpoDilutionReason(relation);
+        } else if ("CAPITAL_INCREASE".equals(label)) {
+            reason = buildCapitalIncreaseReason(relation);
         } else {
             reason = resolveRelReason(relation);
         }
+
 
         relatedMap.get(companyKey).addTag(
                 new TagDto(
