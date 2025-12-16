@@ -32,6 +32,12 @@ public record NewsDetailDto(
                 .map(NewsImage::getImageUrl)
                 .toList();
 
+        String stockCode = null;
+
+        if (mainCompany != null) {
+            stockCode = mainCompany.getStockCode();
+        }
+
         return new NewsDetailDto(
                 news.getId(),
                 news.getTitle(),
@@ -45,9 +51,10 @@ public record NewsDetailDto(
                 news.getThumbnailUrl(),
                 images,
                 news.getPublisher(),
-                mainCompany.getStockCode(),
+                stockCode,          // 👈 null 허용
                 companies,
                 related
         );
     }
+
 }
