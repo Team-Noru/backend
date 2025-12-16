@@ -15,6 +15,9 @@ public class CompanyGraphRelation {
     @GeneratedValue
     private Long internalId;
 
+    @Property("event_type")
+    private String eventType;
+
     @Property("rel_type")
     private String relType;
 

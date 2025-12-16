@@ -19,6 +19,7 @@ public record NewsDetailDto(
         List<String> imageUrl,
         String publisher,
         String companyId,
+        String name,
         List<CompanySentimentDto> companies,
         List<RelatedCompanyDto> related
 ) {
@@ -51,7 +52,8 @@ public record NewsDetailDto(
                 news.getThumbnailUrl(),
                 images,
                 news.getPublisher(),
-                stockCode,          // 👈 null 허용
+                stockCode,
+                mainCompany.getName(),
                 companies,
                 related
         );
