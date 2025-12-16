@@ -34,9 +34,11 @@ public record NewsDetailDto(
                 .toList();
 
         String stockCode = null;
+        String name = null;
 
         if (mainCompany != null) {
             stockCode = mainCompany.getStockCode();
+            name = mainCompany.getName();
         }
 
         return new NewsDetailDto(
@@ -53,7 +55,7 @@ public record NewsDetailDto(
                 images,
                 news.getPublisher(),
                 stockCode,
-                mainCompany.getName(),
+                name,
                 companies,
                 related
         );
