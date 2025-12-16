@@ -12,6 +12,7 @@ public record NewsDetailDto(
         String title,
         String description,
         String content,
+        String summary,
         String publishedAt,
         String author,
         String contentUrl,
@@ -46,6 +47,7 @@ public record NewsDetailDto(
                 news.getTitle(),
                 news.getDescription(),
                 news.getContent(),
+                news.getSummary(),
                 news.getPublishedAt()
                         .toLocalDate()
                         .toString(),
