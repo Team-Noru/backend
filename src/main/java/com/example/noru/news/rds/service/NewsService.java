@@ -2,6 +2,9 @@ package com.example.noru.news.rds.service;
 
 import com.example.noru.common.exception.NewsException;
 import com.example.noru.common.response.ResponseCode;
+import com.example.noru.company.graph.dto.RelatedCompanyBuilder;
+import com.example.noru.company.graph.dto.RelatedCompanyDto;
+import com.example.noru.company.graph.service.CompanyGraphService;
 import com.example.noru.company.rds.entity.Company;
 import com.example.noru.company.rds.repository.CompanyRepository;
 import com.example.noru.news.rds.dto.NewsEsDto; // 아까 만든 DTO import 확인!
@@ -36,6 +39,7 @@ public class NewsService {
     private final NewsRepository newsRepository;
     private final CompanyRepository companyRepository;
     private final PriceRedisService priceRedisService;
+    private final CompanyGraphService companyGraphService;
 
     // [추가됨] Outbox 패턴을 위한 의존성 주입
     private final OutboxEventRepository outboxEventRepository;
@@ -211,6 +215,18 @@ public class NewsService {
                         })
                         .toList();
 
-        return NewsDetailDto.fromEntity(news, mainCompany, sentiments);
+        List<RelatedCompanyDto> related = List.of();
+
+        if (mainCompany != null && mainCompany.getStockCode() != null) {
+
+            related = companyGraphService
+                    .getRelatedCompaniesForNews(mainCompany.getStockCode())
+                    .stream()
+                    .map(RelatedCompanyBuilder::build)
+                    .toList();
+        }
+
+
+        return NewsDetailDto.fromEntity(news, mainCompany, sentiments, related);
     }
 }

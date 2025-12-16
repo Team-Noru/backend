@@ -1,5 +1,6 @@
 package com.example.noru.news.rds.dto.response;
 
+import com.example.noru.company.graph.dto.RelatedCompanyDto;
 import com.example.noru.company.rds.entity.Company;
 import com.example.noru.news.rds.entity.News;
 import com.example.noru.news.rds.entity.NewsImage;
@@ -18,12 +19,14 @@ public record NewsDetailDto(
         List<String> imageUrl,
         String publisher,
         String companyId,
-        List<CompanySentimentDto> companies
+        List<CompanySentimentDto> companies,
+        List<RelatedCompanyDto> related
 ) {
     public static NewsDetailDto fromEntity(
             News news,
             Company mainCompany,
-            List<CompanySentimentDto> companies
+            List<CompanySentimentDto> companies,
+            List<RelatedCompanyDto> related
     ) {
         List<String> images = news.getImages().stream()
                 .map(NewsImage::getImageUrl)
@@ -43,7 +46,8 @@ public record NewsDetailDto(
                 images,
                 news.getPublisher(),
                 mainCompany.getStockCode(),
-                companies
+                companies,
+                related
         );
     }
 }
