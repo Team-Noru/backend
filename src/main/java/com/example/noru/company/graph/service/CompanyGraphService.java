@@ -238,7 +238,7 @@ public class CompanyGraphService {
                         .append("%를 투자");
             }
 
-            sb.append("하여\n")
+            sb.append("하여 ")
                     .append(purpose.isBlank() ? "투자" : purpose)
                     .append(" 목적의 관계를 형성");
 
