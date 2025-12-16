@@ -27,12 +27,12 @@ public class PriceScheduler {
 
     @Scheduled(cron = "0 * 8-14 * * MON-FRI")
     public void updateDomesticMorning() {
-        runDomestic();
+        //runDomestic();
     }
 
     @Scheduled(cron = "0 0-29 15 * * MON-FRI")
     public void updateDomesticAfternoon() {
-        runDomestic();
+        //runDomestic();
     }
 
     @Scheduled(cron = "0 0 8 * * *")

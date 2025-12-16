@@ -127,6 +127,41 @@ public class CompanyGraphService {
         return relation.getRelReason();
     }
 
+    private String buildIpoDilutionReason(CompanyGraphRelation relation) {
+
+        if (relation.getExtraJson() == null || relation.getExtraJson().isBlank()) {
+            return relation.getRelReason();
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(relation.getExtraJson());
+
+            double prevRatio = root.path("prev_ratio").asDouble();
+            double currRatio = root.path("curr_ratio").asDouble();
+            double dilutionPp = root.path("dilution_pp").asDouble();
+            double dilutionPct = root.path("dilution_pct").asDouble();
+            String cause = root.path("change_cause").asText("");
+
+            return String.format(
+                    "IPO 전 지분율: %.2f%%\n" +
+                    "IPO 후 지분율: %.2f%%\n" +
+                    "희석폭: -%.2f%%p\n" +
+                    "희석률: -%.2f%%\n" +
+                    "변동 사유: %s",
+                    prevRatio,
+                    currRatio,
+                    dilutionPp,
+                    dilutionPct,
+                    cause.isBlank() ? "정보 없음" : cause
+            );
+
+
+        } catch (Exception e) {
+            log.warn("Failed to build IPO_DILUTION reason: {}", relation.getExtraJson(), e);
+            return relation.getRelReason();
+        }
+    }
+
 
     private void processRelation(
             CompanyGraphRelation relation,
@@ -153,14 +188,23 @@ public class CompanyGraphService {
             );
         });
 
+        String label = resolveLabel(relation);
+
+        String reason;
+        if ("IPO_DILUTION".equals(label)) {
+            reason = buildIpoDilutionReason(relation);
+        } else {
+            reason = resolveRelReason(relation);
+        }
+
         relatedMap.get(companyKey).addTag(
                 new TagDto(
-                        resolveLabel(relation),
+                        label,
                         resolveDirectionLabel(isOutgoing),
                         relation.getNewsId() != null
                                 ? Long.parseLong(relation.getNewsId())
                                 : null,
-                        resolveRelReason(relation)
+                        reason
                 )
         );
     }
