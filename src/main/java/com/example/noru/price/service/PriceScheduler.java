@@ -25,7 +25,7 @@ public class PriceScheduler {
     private final RateLimiter rateLimiter = RateLimiter.create(3.3);
     private boolean isRunning = false;
 
-    @Scheduled(cron = "0 * 8-14 * * MON-FRI")
+    @Scheduled(cron = "0 */10 8-14 * * MON-FRI")
     public void updateDomesticMorning() {
         runDomestic();
     }
