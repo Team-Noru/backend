@@ -301,7 +301,8 @@ public class CompanyGraphService {
                         relation.getNewsId() != null
                                 ? Long.parseLong(relation.getNewsId())
                                 : null,
-                        reason
+                        reason,
+                        relation.getDisclosureUrl()
                 )
         );
     }

@@ -33,6 +33,9 @@ public class CompanyGraphRelation {
     @Property("rel_reason")
     private String relReason;
 
+    @Property("disclosure_url")
+    private String disclosureUrl;
+
     @TargetNode
     private CompanyGraphEntity investor;
 }

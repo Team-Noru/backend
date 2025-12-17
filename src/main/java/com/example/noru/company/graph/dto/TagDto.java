@@ -6,7 +6,8 @@ public record TagDto(
         String label,
         String direction,
         Long newsId,
-        String relReason
+        String relReason,
+        String disclosureUrl
 ) {}
 
 
